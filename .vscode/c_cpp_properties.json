@@ -5,7 +5,7 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/common/",
-                "E:/Simon/Visual Studio 2022/asio-1.20.0/include"
+                "D:/Programme_D/asio-1.20.0/include"
             ],
             "defines": [
                 "_DEBUG",
