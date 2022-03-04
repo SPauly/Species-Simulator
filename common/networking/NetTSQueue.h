@@ -1,5 +1,5 @@
 #pragma once
-#include "CommonNetInclude.h"
+#include "NetCommonInclude.h"
 
 namespace sim
 {

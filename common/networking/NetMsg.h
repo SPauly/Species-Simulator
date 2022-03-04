@@ -1,5 +1,5 @@
 #pragma once
-#include "CommonNetInclude.h"
+#include "NetCommonInclude.h"
 
 namespace sim // global namespace for species simulator
 {
