@@ -17,6 +17,7 @@ namespace sim
             }
             virtual ~Server_Interface()
             {
+                stop_server();
             }
 
             bool start_server()
@@ -62,6 +63,7 @@ namespace sim
                                 m_deqConnections.push_back(std::move(new_connection));
 
                                 m_deqConnections.back()->connect_to_client(m_nIDCounter++);
+                                // inform about approved connection
                             }
                             else
                             {
@@ -77,9 +79,9 @@ namespace sim
                     });
             }
 
-            void message_client(std::shared_ptr<Connection<T>> client, const Message<T> msg)
+            void message_client(std::shared_ptr<Connection<T>> client, const Message<T> &msg)
             {
-                if(client && client->is_connected())
+                if (client && client->is_connected())
                 {
                     client->send(msg);
                 }
@@ -91,15 +93,15 @@ namespace sim
                 }
             }
 
-            void message_all_clients(const Message<T>& msg, std::shared_ptr<Connection<T>> pIgnoreClient = nullptr)
+            void message_all_clients(const Message<T> &msg, std::shared_ptr<Connection<T>> pIgnoreClient = nullptr)
             {
                 bool invalid_client_exists = false;
 
-                for(auto &client : m_deqConnections)
+                for (auto &client : m_deqConnections)
                 {
-                    if(client && client->is_connected())
+                    if (client && client->is_connected())
                     {
-                        if(client != pIgnoreClient)
+                        if (client != pIgnoreClient)
                             client->send(msg);
                     }
                     else
@@ -110,7 +112,7 @@ namespace sim
                     }
                 }
 
-                if(invalid_client_exists)
+                if (invalid_client_exists)
                 {
                     m_deqConnections.erase(std::remove(m_deqConnections.begin(), m_deqConnections.end(), nullptr), m_deqConnections.end());
                 }
@@ -119,7 +121,7 @@ namespace sim
             void update(size_t nMaxMessages = -1)
             {
                 size_t nMessageCount = 0;
-                while(nMessageCount < nMaxMessages && !m_qMessagesIn.empty())
+                while (nMessageCount < nMaxMessages && !m_qMessagesIn.empty())
                 {
                     auto msg = m_qMessagesIn.pop_front();
                     on_message(msg.remote, msg.msg);
@@ -135,10 +137,10 @@ namespace sim
             virtual void on_client_disconnect(std::shared_ptr<Connection<T>> client)
             {
             }
-            virtual void on_message(std::shared_ptr<Connection<t>> client, Message<T> &msg)
+            virtual void on_message(std::shared_ptr<Connection<T>> client, Message<T> &msg)
             {
             }
-            
+
         private:
             asio::io_context m_AsioContext;
             std::thread m_ContextThread;
@@ -146,7 +148,7 @@ namespace sim
 
             TSQueue<OwnedMessage<T>> m_qMessagesIn;
 
-            std::deque < std::shared_ptr<Connection<T>> m_deqConnections;
+            std::deque<std::shared_ptr<Connection<T>>> m_deqConnections;
 
             uint32_t m_nIDCounter = 10000;
         };

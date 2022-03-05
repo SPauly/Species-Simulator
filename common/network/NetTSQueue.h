@@ -79,6 +79,6 @@ namespace sim
                 deqQueue.pop_back();
                 return t;
             }
-        }
+        };
     }
 }

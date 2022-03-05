@@ -19,9 +19,9 @@ namespace sim
 
         public:
             Connection(owner parent, asio::io_context context, asio::ip::tcp::socket socket, TSQueue<OwnedMessage<T>> &qMessagesIn) // owner = server | client, context = needs an asio context to run in, takes over the socket and handles connection, port = port at which to connect, Queue of Messages comming in
-                : m_context(context);
-            m_socket(socket);
-            m_qMessagesIn(m_qMessagesIn)
+                : m_context(context),
+                  m_socket(socket),
+                  m_qMessagesIn(qMessagesIn)
             {
                 m_nowner = parent;
             }
@@ -30,7 +30,7 @@ namespace sim
             }
 
         public:
-            bool connect_to_server(const asio::ip::tcp::resolver::results_type &endpoint) // function only used by clients to connect to the server provided via an endpoint
+            void connect_to_server(const asio::ip::tcp::resolver::results_type &endpoint) // function only used by clients to connect to the server provided via an endpoint
             {
                 if (m_nowner == owner::client)
                 {
@@ -45,7 +45,7 @@ namespace sim
                 }
             }
 
-            bool connect_to_client(uint32_t uid = 0) // function only used by the server to connect to a client giving him the provided uid
+            void connect_to_client(uint32_t uid = 0) // function only used by the server to connect to a client giving him the provided uid
             {
                 if (m_nowner == owner::server)
                 {
@@ -77,7 +77,7 @@ namespace sim
                 return m_id;
             }
 
-            bool send(const Message<T> &msg) // primes the asio context with a new task of writing the provided message
+            void send(const Message<T> &msg) // primes the asio context with a new task of writing the provided message
             {
                 asio::post(m_context,
                            [this, msg]()
@@ -99,10 +99,10 @@ namespace sim
                                  {
                                      if (!ec)
                                      {
-                                         if (m_tempMessagesIn.header.size > 0)
+                                         if (m_tempMessageIn.header.size > 0)
                                          {
-                                             m_tempMessagesIn.body.resize(m_tempMessagesIn.header.size); // allocate the space for the body
-                                             mf_read_body();                                             // prime context to read the body
+                                             m_tempMessageIn.body.resize(m_tempMessageIn.header.size); // allocate the space for the body
+                                             mf_read_body();                                           // prime context to read the body
                                          }
                                          else
                                          {
