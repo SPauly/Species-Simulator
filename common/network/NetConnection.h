@@ -10,17 +10,17 @@ namespace sim
         template <typename T>
         class Connection : public std::enable_shared_from_this<Connection<T>> // Object to handle connections between server and client -> abstracts all the communication related stuff
         {
-        private:
-            enum class owner : uint8_t
+        public:
+            enum class owner
             {
                 server,
                 client
             };
 
         public:
-            Connection(owner parent, asio::io_context context, asio::ip::tcp::socket socket, TSQueue<OwnedMessage<T>> &qMessagesIn) // owner = server | client, context = needs an asio context to run in, takes over the socket and handles connection, port = port at which to connect, Queue of Messages comming in
+            Connection(owner parent, asio::io_context& context, asio::ip::tcp::socket socket, TSQueue<OwnedMessage<T>> &qMessagesIn) // owner = server | client, context = needs an asio context to run in, takes over the socket and handles connection, port = port at which to connect, Queue of Messages comming in
                 : m_context(context),
-                  m_socket(socket),
+                  m_socket(std::move(socket)),
                   m_qMessagesIn(qMessagesIn)
             {
                 m_nowner = parent;
@@ -94,7 +94,7 @@ namespace sim
         private:
             void mf_read_header() // automaticaly calls read body function or calls itself again if there is no body to read
             {
-                asio::async_read(m_socket, asio::buffer(m_tempMessageIn.header, sizeof(MessageHeader<T>)),
+                asio::async_read(m_socket, asio::buffer(&m_tempMessageIn.header, sizeof(MessageHeader<T>)),
                                  [this](std::error_code ec, std::size_t length)
                                  {
                                      if (!ec)
@@ -111,7 +111,7 @@ namespace sim
                                      }
                                      else
                                      {
-                                         // failed to read from socket
+                                         std::cout << "[" << m_id << "] Read Header Fail.\n";
                                          m_socket.close();
                                      }
                                  });
@@ -119,8 +119,8 @@ namespace sim
 
             void mf_read_body() // reads the body of the messages already stored in tempMessage -> only called by mf_read_header()
             {
-                asio::async_read(m_socket, asio::buffer(m_tempMessageIn.body, m_tempMessageIn.body.size()),
-                                 [this](std::error_code ec, size_t lenght)
+                asio::async_read(m_socket, asio::buffer(m_tempMessageIn.body.data(), m_tempMessageIn.body.size()),
+                                 [this](std::error_code ec, std::size_t lenght)
                                  {
                                      if (!ec)
                                      {
@@ -128,7 +128,7 @@ namespace sim
                                      }
                                      else
                                      {
-                                         // failed to read from socket so close it
+                                         std::cout << "[" << m_id << "] Read Body Fail.\n";
                                          m_socket.close();
                                      }
                                  });
@@ -151,7 +151,7 @@ namespace sim
             void mf_write_header() // writes the first header in outgoing message queue to the socket and calls mf_write_body() function -> starts ones the first message is pushed into the queue by send()
             {
                 asio::async_write(m_socket, asio::buffer(&m_qMessagesOut.front().header, sizeof(MessageHeader<T>)),
-                                  [this](std::error_code ec, size_t length)
+                                  [this](std::error_code ec, std::size_t length)
                                   {
                                       if (!ec)
                                       {
@@ -170,7 +170,7 @@ namespace sim
                                       }
                                       else
                                       {
-                                          // inform that couldn't write
+                                          std::cout << "[" << m_id << "] Write Header Fail.\n";
                                           m_socket.close();
                                       }
                                   });
@@ -179,7 +179,7 @@ namespace sim
             void mf_write_body() // writes the body of the front message in the outgoing queue to the socket -> called by mf_write_header() -> calls mf_write_header again if there are still messages left
             {
                 asio::async_write(m_socket, asio::buffer(m_qMessagesOut.front().body.data(), m_qMessagesOut.front().body.size()),
-                                  [this](std::error_code ec, size_t length)
+                                  [this](std::error_code ec, std::size_t length)
                                   {
                                       if (!ec)
                                       {
@@ -191,7 +191,7 @@ namespace sim
                                       }
                                       else
                                       {
-                                          // inform that couldn't write body
+                                          std::cout << "[" << m_id << "] Write Body Fail.\n";
                                           m_socket.close();
                                       }
                                   });

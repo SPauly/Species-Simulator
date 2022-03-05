@@ -31,11 +31,11 @@ namespace sim
                 catch (const std::exception &e)
                 {
                     // throw a net error here
-                    // std::cerr << e.what() << '\n';
+                    std::cerr << "[SERVER] Exception: " << e.what() << '\n';
                     return false;
                 }
 
-                // inform that new connection was made
+                std::cout << "[SERVER] Started!\n";
                 return true;
             }
 
@@ -46,7 +46,7 @@ namespace sim
                 if (m_ContextThread.joinable()) // see if the thread can be joined
                     m_ContextThread.join();
 
-                // inform about server stop
+                std::cout << "[SERVER] Stopped!\n";
             }
 
             void wait_for_client_connection()
@@ -56,6 +56,7 @@ namespace sim
                     {
                         if (!ec)
                         {
+                            std::cout << "[SERVER] New Connection: " << socket.remote_endpoint() << "\n";
                             std::shared_ptr<Connection<T>> new_connection = std::make_shared<Connection<T>>(Connection<T>::owner::server, m_AsioContext, std::move(socket), m_qMessagesIn); // create a new connection object via which we can talk to the client
 
                             if (on_client_connect(new_connection)) // give the user the possibility to decide about the connection
@@ -63,16 +64,17 @@ namespace sim
                                 m_deqConnections.push_back(std::move(new_connection)); // add connection to dequeue
 
                                 m_deqConnections.back()->connect_to_client(m_nIDCounter++); // try to connect to the client -> primes context with tasks of reading the header
-                                // inform about approved connection
+
+                                std::cout << "[" << m_deqConnections.back()->get_uid() << "] Connection Approved\n";
                             }
                             else
                             {
-                                // inform that client has been denied
+                                std::cout << "[-----] Connection Denied\n";
                             }
                         }
                         else
                         {
-                            // new connection error
+                            std::cout << "[SERVER] New Connection Error: " << ec.message() << "\n";
                         }
 
                         wait_for_client_connection();
