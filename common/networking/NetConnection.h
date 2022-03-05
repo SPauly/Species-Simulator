@@ -8,7 +8,7 @@ namespace sim
     namespace net
     {
         template <typename T>
-        class Connection : std::enable_shared_from_this<Connection<T>> // Object to handle connections between server and client -> abstracts all the communication related stuff
+        class Connection : public std::enable_shared_from_this<Connection<T>> // Object to handle connections between server and client -> abstracts all the communication related stuff
         {
         private:
             enum class owner : uint8_t
@@ -77,6 +77,20 @@ namespace sim
                 return m_id;
             }
 
+            bool send(const Message<T> &msg)
+            {
+                asio::post(m_context,
+                           [this, msg]()
+                           {
+                               bool b_is_already_writing_messages = !m_qMessagesOut.empty();
+                               m_qMessagesOut.push_back(msg);
+                               if (!b_is_already_writing_messages)
+                               {
+                                   mf_write_header();
+                               }
+                           });
+            }
+
         private:
             void mf_read_header()
             {
@@ -134,7 +148,54 @@ namespace sim
                 mf_read_header();
             }
 
-            
+            void mf_write_header()
+            {
+                asio::async_write(m_socket, asio::buffer(&m_qMessagesOut.front().header, sizeof(MessageHeader<T>)),
+                                  [this](std::error_code ec, size_t length)
+                                  {
+                                      if (!ec)
+                                      {
+                                          if (m_qMessagesOut.front().body.size() > 0)
+                                          {
+                                              mf_write_body();
+                                          }
+                                          else
+                                          {
+                                              m_qMessagesOut.pop_front();
+                                              if (!m_qMessagesOut.empty())
+                                              {
+                                                  mf_write_header();
+                                              }
+                                          }
+                                      }
+                                      else
+                                      {
+                                          // inform that couldn't write
+                                          m_socket.close();
+                                      }
+                                  });
+            }
+
+            void mf_write_body()
+            {
+                asio::async_write(m_socket, asio::buffer(m_qMessagesOut.front().body.data(), m_qMessagesOut.front().body.size()),
+                                  [this](std::error_code ec, size_t length)
+                                  {
+                                      if (!ec)
+                                      {
+                                          m_qMessagesOut.pop_front();
+                                          if (!m_qMessagesOut.empty())
+                                          {
+                                              mf_write_header();
+                                          }
+                                      }
+                                      else
+                                      {
+                                          // inform that couldn't write body
+                                          m_socket.close();
+                                      }
+                                  });
+            }
 
         protected:
             asio::io_context &m_context;    // does not own the context since it only runs in it
