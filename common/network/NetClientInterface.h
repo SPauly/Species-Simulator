@@ -25,9 +25,9 @@ namespace sim
                 try
                 {
                     asio::ip::tcp::resolver resolver(m_AsioContext);
-                    asio::ip::tcp::resolver::results_type endpoints = resolver.resolve(host, std::to_string(port))
+                    asio::ip::tcp::resolver::results_type endpoints = resolver.resolve(host, std::to_string(port));
 
-                                                                          m_uptrConnection = std::make_unique<Connection<T>>(
+                    m_uptrConnection = std::make_unique<Connection<T>>(
                         Connection<T>::owner::client, m_AsioContext,
                         asio::ip::tcp::socket(m_AsioContext), m_qMessagesIn);
 
@@ -60,13 +60,22 @@ namespace sim
 
             bool is_connected()
             {
-                if(m_uptrConnection)
+                if (m_uptrConnection)
                     return m_uptrConnection->is_connected();
                 else
                     return false;
             }
 
-            TSQueue<OwnedMessage<T>>& get_incomming_messages()
+        public:
+            void send(const Message<T>& msg)
+            {
+                if(is_connected())
+                {
+                    m_uptrConnection->send(msg);
+                }
+            }
+
+            TSQueue<OwnedMessage<T>> &get_incomming_messages()
             {
                 return m_qMessagesIn;
             }
