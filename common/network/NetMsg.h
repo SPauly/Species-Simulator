@@ -25,7 +25,7 @@ namespace sim // global namespace for species simulator
 
             friend std::ostream &operator<<(std::ostream &os, const Message<T> msg) // overload << operator info about message into output stream for std::cout<<msg;
             {
-                os << "Message ID: " << (int)msg.header.id << " Message Size " << msg.size();
+                os << "Message ID: " << int(msg.header.id) << " Message Size " << msg.header.size;
                 return os;
             }
 
@@ -68,7 +68,7 @@ namespace sim // global namespace for species simulator
         template <typename T>
         struct OwnedMessage // Message that is owned by some connection
         {
-            std::shared_ptr<Connection<T>> owner = nullptr;
+            std::shared_ptr<Connection<T>> remote = nullptr;
             Message<T> msg{};
 
             // overload all the necessary operators
@@ -77,20 +77,7 @@ namespace sim // global namespace for species simulator
                 os << msg.msg;
                 return os;
             }
-
-            template <typename DataType>
-            friend OwnedMessage<T> &operator<<(OwnedMessage<T> &msg, const DataType &data)
-            {
-                msg.msg << data;
-                return msg;
-            }
-
-            template <typename DataType>
-            friend OwnedMessage<T> &operator>>(OwnedMessage<T> &msg, const DataType &data)
-            {
-                msg.msg >> data;
-                return msg;
-            }
+            
         };
 
     }

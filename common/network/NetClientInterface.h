@@ -9,7 +9,7 @@ namespace sim
     namespace net
     {
         template <typename T>
-        class Client_Interface
+        class Client_Interface //Client Interface abstracts the connection to the server 
         {
         public:
             Client_Interface()
@@ -20,26 +20,25 @@ namespace sim
                 // disconnect
             }
 
-            bool connect_to_server(const std::string &host, const uint16_t port)
+            bool connect_to_server(const std::string &host, const uint16_t port) // host can be a domain or IP4 Adress 
             {
                 try
                 {
                     asio::ip::tcp::resolver resolver(m_AsioContext);
                     asio::ip::tcp::resolver::results_type endpoints = resolver.resolve(host, std::to_string(port));
 
-                    m_uptrConnection = std::make_unique<Connection<T>>(
+                    m_uptrConnection = std::make_unique<Connection<T>>( //creates a connection object
                         Connection<T>::owner::client, m_AsioContext,
                         asio::ip::tcp::socket(m_AsioContext), m_qMessagesIn);
 
-                    m_uptrConnection->connect_to_server(endpoints);
+                    m_uptrConnection->connect_to_server(endpoints); //try connect to the server via the provided entpoint
 
-                    m_ContextThread = std::thread([this]()
-                                                  { m_AsioContext.run(); });
+                    m_ContextThread = std::thread([this]() 
+                                                  { m_AsioContext.run(); }); // give asio context a thread to run in
                 }
                 catch (const std::exception &e)
                 {
-                    // inform that could not connect to server
-                    // std::cerr << e.what() << '\n';
+                    std::cerr << "Client Exception: " << e.what() << '\n';
                     return false;
                 }
                 return true;
@@ -48,11 +47,11 @@ namespace sim
             void disconnect()
             {
                 if (is_connected())
-                    m_uptrConnection->disconnect();
+                    m_uptrConnection->disconnect(); //disconnect from server
 
-                m_AsioContext.stop();
+                m_AsioContext.stop();   //stop asio context
 
-                if (m_ContextThread.joinable())
+                if (m_ContextThread.joinable()) //join thread
                     m_ContextThread.join();
 
                 m_uptrConnection.release();
