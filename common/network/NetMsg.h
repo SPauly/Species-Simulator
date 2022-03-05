@@ -20,7 +20,7 @@ namespace sim // global namespace for species simulator
 
             size_t size() const // returns the actual size of the entire message
             {
-                return sizeof(MessageHeader<T>) + body.size();
+                return body.size();
             }
 
             friend std::ostream &operator<<(std::ostream &os, const Message<T> msg) // overload << operator info about message into output stream for std::cout<<msg;
