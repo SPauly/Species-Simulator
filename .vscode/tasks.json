@@ -1,0 +1,61 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "cppbuild",
+			"label": "C/C++: g++.exe Compile Server",
+			"command": "C:/msys64/mingw64/bin/g++.exe",
+			"args": [
+				"-fdiagnostics-color=always",
+				"--std",
+				"c++20",
+				"-g",
+				"${workspaceFolder}\\server\\src\\*.cpp",
+				"-lws2_32",
+				"-lwsock32",
+				"-I",
+				"${workspaceFolder}\\common\\network",
+				"-I",
+				"E:/Simon/Visual Studio 2022/asio-1.20.0/include",
+				"-o",
+				"${workspaceFolder}\\server\\Server.exe"
+			],
+			"options": {
+				"cwd": "C:/msys64/mingw64/bin"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build",
+			"detail": "Compiler: C:/msys64/mingw64/bin/g++.exe"
+		},
+		{
+			"type": "cppbuild",
+			"label": "C/C++: g++.exe Compile Client",
+			"command": "C:/msys64/mingw64/bin/g++.exe",
+			"args": [
+				"-fdiagnostics-color=always",
+				"--std",
+				"c++20",
+				"-g",
+				"${workspaceFolder}\\client\\src\\*.cpp",
+				"-lws2_32",
+				"-lwsock32",
+				"-I",
+				"${workspaceFolder}\\common\\network",
+				"-I",
+				"E:/Simon/Visual Studio 2022/asio-1.20.0/include",
+				"-o",
+				"${workspaceFolder}\\client\\Client.exe"
+			],
+			"options": {
+				"cwd": "C:/msys64/mingw64/bin"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build",
+			"detail": "Compiler: C:/msys64/mingw64/bin/g++.exe"
+		},
+	]
+}

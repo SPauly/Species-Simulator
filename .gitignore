@@ -10,6 +10,9 @@
 *.userosscache
 *.sln.docstates
 
+#ignore cpp properties
+.vscode/c_cpp_properties.json
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
