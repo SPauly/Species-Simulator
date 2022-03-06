@@ -111,7 +111,7 @@ int main()
 
     while (1)
     {
-        server.update();
+        server.update(-1, true);
     }
     return 0;
 }
