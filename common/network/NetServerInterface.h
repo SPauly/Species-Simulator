@@ -120,8 +120,10 @@ namespace sim
                 }
             }
 
-            void update(size_t nMaxMessages = -1) // forwards all incomming messages via abstracted on_message function
+            void update(size_t nMaxMessages = -1, bool bwait = false) // forwards all incomming messages via abstracted on_message function
             {
+                if(bwait)
+                    m_qMessagesIn.wait();
                 size_t nMessageCount = 0;
                 while (nMessageCount < nMaxMessages && !m_qMessagesIn.empty())
                 {
