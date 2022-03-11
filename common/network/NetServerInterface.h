@@ -108,7 +108,7 @@ namespace sim
                             {
                                 m_deqConnections.push_back(std::move(new_connection)); // add connection to dequeue
 
-                                m_deqConnections.back()->connect_to_client(this, m_nIDCounter++); // try to connect to the client -> primes context with tasks of reading the header
+                                m_deqConnections.back()->connect_to_client(this, m_nIDCounter++); // try to connect to the client -> first validates client
 
                                 std::cout << "[" << m_deqConnections.back()->get_uid() << "] Connection Approved\n";
                             }
@@ -191,9 +191,8 @@ namespace sim
             }
 
         public:
-            virtual void on_client_validated(std::shared_ptr<Connection<T>> client)
+            virtual void on_client_validated(std::shared_ptr<Connection<T>> client) // gets called when client is validated
             {
-                  
             }
         private:
             asio::io_context m_AsioContext;
