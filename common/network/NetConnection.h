@@ -52,6 +52,9 @@ namespace sim
 {
     namespace net
     {
+        template <typename T> //forward declare Server_Interface so I can call on_client_validated()
+        class Server_Interface;
+
         template <typename T>
         class Connection : public std::enable_shared_from_this<Connection<T>> // Object to handle connections between server and client -> abstracts all the communication related stuff
         {
@@ -69,6 +72,19 @@ namespace sim
                   m_qMessagesIn(qMessagesIn)
             {
                 m_nowner = parent;
+
+                //do a handshake with client first
+                if(m_nowner == owner::server)
+                {
+                    m_nHandshakeOut = uint64_t(std::chrono::system_clock::now().time_since_epoch().count());
+                    m_nHandshakeCheck = mf_scramble(m_nHandshakeOut);
+
+                }
+                else
+                {
+                    m_nHandshakeIn = 0;
+                    m_nHandshakeOut = 0;
+                }
             }
             virtual ~Connection()
             {
@@ -84,20 +100,22 @@ namespace sim
                                         {
                                             if (!ec)
                                             {
-                                                mf_read_header(); // prime the asio context to start watching for messages
+                                                mf_read_validation();// prime the asio context with reading a validation
                                             }
                                         });
                 }
             }
 
-            void connect_to_client(uint32_t uid = 0) // function only used by the server to connect to a client giving him the provided uid
+            void connect_to_client(sim::net::Server_Interface<T>* server, uint32_t uid = 0) // function only used by the server to connect to a client giving him the provided uid
             {
                 if (m_nowner == owner::server)
                 {
                     if (m_socket.is_open()) // check if the connection to client has already been established -> done by client
                     {
                         m_id = uid;       // this connection now has a unique id
-                        mf_read_header(); // prime the asio context to start watching for headers
+                        
+                        mf_write_validation(); // prime the asio context write a validation to the client
+                        mf_read_validation(server); //wait for client response
                     }
                 }
             }
@@ -137,6 +155,61 @@ namespace sim
             }
 
         private:
+
+            void mf_read_validation(sim::net::Server_Interface<T>* server = nullptr) //reads the 8 bytes of validation in 
+            {
+                asio::async_read(m_socket, asio::buffer(&m_nHandshakeIn, sizeof(uint64_t)),
+                    [this, server](std::error_code ec, size_t length)
+                    {   
+                        if(!ec)
+                        {
+                            if(m_nowner == owner::server)
+                            {
+                                if(m_nHandshakeIn == m_nHandshakeCheck)
+                                {
+                                    std::cout << "Client Validated" << std::endl;
+                                    server->on_client_validated(this->shared_from_this()); //call a function (overloadable) from the server_interface on what to do when a client connects
+
+                                    mf_read_header(); //prime the asio context with the usual work
+                                }
+                                else
+                                {
+                                    std::cout << "Client Disconnected (Fail Validation)" <<std::endl;
+                                    m_socket.close();
+                                }
+
+                            }
+                            else
+                            {
+                                m_nHandshakeOut = mf_scramble(m_nHandshakeIn);
+                                mf_write_validation();
+                            }
+                        }
+                        else
+                        {
+                            std::cout << "Client disconnected (ReadValidation)" <<std::endl;
+                            m_socket.close();
+                        }
+                    }); 
+            }
+
+            void mf_write_validation() //write validation in m_nHandShakeOut to socket  
+            {
+                asio::async_write(m_socket, asio::buffer(&m_nHandshakeOut, sizeof(uint64_t)),
+                    [this](std::error_code ec, size_t length)
+                    {
+                        if(!ec)
+                        {
+                            if(m_nowner == owner::client)
+                                mf_read_header();
+                        }
+                        else
+                        {
+                            m_socket.close();
+                        }
+                    });
+            }      
+
             void mf_read_header() // automaticaly calls read body function or calls itself again if there is no body to read
             {
                 asio::async_read(m_socket, asio::buffer(&m_tempMessageIn.header, sizeof(MessageHeader<T>)),
@@ -242,6 +315,13 @@ namespace sim
                                   });
             }
 
+            uint64_t mf_scramble(uint64_t nInput) //scramble the data nInput -> later must be a different one
+            {
+                uint64_t out = nInput ^ 0xDEADBEEFC0DECAFE;
+                out = (out & 0xF0F0F0F0F0F0F00F) >> 4 | (out & 0xF0F0F0F0F0F0F000) << 4;
+                return out ^ 0xC0DEFACE12345678;
+            }
+
         protected:
             asio::io_context &m_context;    // does not own the context since it only runs in it
             asio::ip::tcp::socket m_socket; // socket it handles
@@ -252,6 +332,11 @@ namespace sim
 
             owner m_nowner = owner::server;
             uint32_t m_id = 0; // unique user id
+
+            //8 byte variables used for Handshake
+            uint64_t m_nHandshakeOut = 0;
+            uint64_t m_nHandshakeIn = 0;
+            uint64_t m_nHandshakeCheck = 0; 
         };
     }
 }
