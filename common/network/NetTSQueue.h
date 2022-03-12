@@ -57,7 +57,6 @@ namespace sim
             std::mutex muxQueue;
             std::deque<T> deqQueue;
             std::condition_variable cv_push;
-            std::mutex muxWait;
 
         public:
             TSQueue() = default;                  // default CTOR
@@ -86,7 +85,6 @@ namespace sim
                 std::scoped_lock lock(muxQueue);
                 deqQueue.emplace_front(std::move(item));
 
-                std::unique_lock<std::mutex> wait_lock(muxWait);
                 cv_push.notify_one();
             }
 
@@ -95,7 +93,6 @@ namespace sim
                 std::scoped_lock lock(muxQueue);
                 deqQueue.emplace_back(std::move(item));
 
-                std::unique_lock<std::mutex> wait_lock(muxWait);
                 cv_push.notify_one();
             }
 
@@ -135,9 +132,10 @@ namespace sim
 
             void wait()
             {
-                while (empty())
+                std::unique_lock<std::mutex> wait_lock(muxQueue);
+
+                while (deqQueue.empty())
                 {
-                    std::unique_lock<std::mutex> wait_lock(muxWait);
                     cv_push.wait(wait_lock);
                 }
             }
