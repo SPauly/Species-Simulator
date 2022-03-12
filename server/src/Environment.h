@@ -5,14 +5,13 @@
 
 namespace sim
 {
-    template <typename T>
     class Environment : public sim::Map<sim::params::MapType>
     {   
     public:
-        Environment(T = sim::params::MapType::Environment);
+        Environment();
         ~Environment();
 
     private:  
-
+    
     };
 }
