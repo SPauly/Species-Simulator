@@ -3,12 +3,8 @@
 
 int main()
 {
-    Server server(60000);
-    server.start_server();
+    sim::Server server(60000,2);
+    server.run(-1, true);
 
-    while (1)
-    {
-        server.update(-1, true);
-    }
     return 0;
 }

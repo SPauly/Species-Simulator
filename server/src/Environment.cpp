@@ -2,5 +2,8 @@
 
 namespace sim
 {
-    
+    Environment::Environment()
+    {}
+    Environment::~Environment()
+    {}
 }

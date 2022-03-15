@@ -26,6 +26,8 @@ namespace sim
             Map(T);
             virtual ~Map();
 
+            void add_entity();
+
         private:
             uint16_t m_width = 0;
             uint16_t m_height = 0;

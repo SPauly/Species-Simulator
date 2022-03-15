@@ -1,17 +1,19 @@
 #pragma once
 #include <cstdint>
-#include "../common/utilities/Params.h"
-#include "../common/utilities/BasicTypes.h"
+#include <vector>
+#include "Params.h"
+#include "BasicTypes.h"
 
 namespace sim
 {
-    class Environment : public sim::Map<sim::params::MapType>
+    class Environment
     {   
     public:
         Environment();
         ~Environment();
 
     private:  
+        std::vector<sim::types::Map<sim::params::MapType>> m_maps;
     
     };
 }

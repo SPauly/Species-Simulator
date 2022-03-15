@@ -16,6 +16,8 @@
 				"-I",
 				"${workspaceFolder}\\common\\network",
 				"-I",
+				"${workspaceFolder}\\common\\utilities",
+				"-I",
 				"E:/Simon/Visual Studio 2022/asio-1.20.0/include",
 				"-o",
 				"${workspaceFolder}\\server\\Server.exe"
