@@ -18,7 +18,6 @@ namespace sim
             S style = 0;
         };
 
-
         template <typename T>
         class Map
         {
@@ -39,5 +38,24 @@ namespace sim
             std::vector<Entity<sim::params::EntityType, sim::params::EntityStyle>> m_vecEntities;
         };
 
+        struct WinConsole
+        {
+            WinConsole() = default;
+            WinConsole(int, int, int, int);
+            ~WinConsole();
+
+            void create();
+            void create(int, int, int, int);
+
+
+            int _nScreenWidth = 130;
+            int _nScreenHeight = 100;
+
+            wchar_t *_screen = nullptr;
+            HANDLE _hConsole;
+            HWND _hWindow;
+            CONSOLE_SCREEN_BUFFER_INFO _consoleInfo;
+            DWORD m_dwBytesWritten = 0;
+        };
     }
 }

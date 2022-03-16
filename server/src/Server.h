@@ -26,6 +26,14 @@ namespace sim
         virtual void on_message(std::shared_ptr<sim::net::Connection<sim::params::MessageType>>, sim::net::Message<sim::params::MessageType> &) override;
 
     private:
+        //window dependencies
+        int m_nScreenWidth = 130;
+        int m_nScreenHeight = 100;
+        wchar_t* m_screen = nullptr;
+        HANDLE m_hConsole;
+        HWND m_hWindow;
+        DWORD m_dwBytesWritten = 0;
+
         std::thread m_WorkThread;
 
         size_t m_nMapsCount = 0;
