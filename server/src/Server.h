@@ -27,12 +27,7 @@ namespace sim
 
     private:
         //window dependencies
-        int m_nScreenWidth = 130;
-        int m_nScreenHeight = 100;
-        wchar_t* m_screen = nullptr;
-        HANDLE m_hConsole;
-        HWND m_hWindow;
-        DWORD m_dwBytesWritten = 0;
+    	sim::types::WinConsole m_console{100,10,100,300};
 
         std::thread m_WorkThread;
 

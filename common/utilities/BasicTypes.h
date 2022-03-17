@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <windows.h>
 #include "Params.h"
 
 namespace sim
@@ -40,21 +41,25 @@ namespace sim
 
         struct WinConsole
         {
-            WinConsole() = default;
             WinConsole(int, int, int, int);
             ~WinConsole();
 
-            void create();
-            void create(int, int, int, int);
+            bool create_console();
+            bool create_console(int, int, int, int);
 
-
+            int _nxpos = 0;
+            int _nypos = 0;
             int _nScreenWidth = 130;
             int _nScreenHeight = 100;
 
+            SMALL_RECT _rectWindow;
+            COORD coord;
+
             wchar_t *_screen = nullptr;
             HANDLE _hConsole;
-            HWND _hWindow;
-            CONSOLE_SCREEN_BUFFER_INFO _consoleInfo;
+            HANDLE _hConsoleOrigin;
+            CONSOLE_SCREEN_BUFFER_INFO _csbi;
+            CONSOLE_SCREEN_BUFFER_INFO _csbiOrigin;
             DWORD m_dwBytesWritten = 0;
         };
     }

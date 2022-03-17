@@ -54,21 +54,12 @@ namespace sim
 
     bool Server::mf_start_work_thread()
     {
-        // set up window    
-        m_hWindow = GetConsoleWindow(); 
-        if(m_hWindow != NULL) {
-            SetWindowPos(m_hWindow ,0,0,0 ,1000,300,SWP_SHOWWINDOW|SWP_NOMOVE);
-        }
-        m_screen = new wchar_t[m_nScreenWidth * m_nScreenHeight];
-        m_hConsole = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
-        SetConsoleActiveScreenBuffer(m_hConsole);
-        m_dwBytesWritten = 0;
 
         // start work in thread
         try
         {
-            m_WorkThread = std::thread([this]()
-                                       { mf_update_work(); });
+            //m_WorkThread = std::thread([this]()
+            //                           { mf_update_work(); });
         }
         catch (const std::exception &e)
         {
