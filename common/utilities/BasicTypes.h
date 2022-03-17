@@ -39,28 +39,9 @@ namespace sim
             std::vector<Entity<sim::params::EntityType, sim::params::EntityStyle>> m_vecEntities;
         };
 
-        struct WinConsole
+        struct ConsoleStyle
         {
-            WinConsole(int, int, int, int);
-            ~WinConsole();
-
-            bool create_console();
-            bool create_console(int, int, int, int);
-
-            int _nxpos = 0;
-            int _nypos = 0;
-            int _nScreenWidth = 130;
-            int _nScreenHeight = 100;
-
-            SMALL_RECT _rectWindow;
-            COORD coord;
-
-            wchar_t *_screen = nullptr;
-            HANDLE _hConsole;
-            HANDLE _hConsoleOrigin;
-            CONSOLE_SCREEN_BUFFER_INFO _csbi;
-            CONSOLE_SCREEN_BUFFER_INFO _csbiOrigin;
-            DWORD m_dwBytesWritten = 0;
+            
         };
     }
 }

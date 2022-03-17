@@ -4,6 +4,7 @@
 #include "NetInclude.h"
 #include "Params.h"
 #include "Environment.h"
+#include "WinConsole.h"
 
 namespace sim
 {
@@ -27,7 +28,7 @@ namespace sim
 
     private:
         //window dependencies
-    	sim::types::WinConsole m_console{100,10,100,300};
+    	sim::WinConsole m_console{0,0,300,100, 8, 16};
 
         std::thread m_WorkThread;
 
