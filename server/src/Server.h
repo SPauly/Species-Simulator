@@ -21,6 +21,8 @@ namespace sim
         bool mf_start_work_thread();
         void mf_update_work();
 
+        void test_console();
+
     protected:
         virtual bool on_client_connect(std::shared_ptr<sim::net::Connection<sim::params::MessageType>>) override;
         virtual void on_client_disconnect(std::shared_ptr<sim::net::Connection<sim::params::MessageType>>) override;
@@ -28,7 +30,8 @@ namespace sim
 
     private:
         //window dependencies
-    	sim::WinConsole m_console{0,0,300,100, 8, 16};
+        int x,y;
+    	sim::WinConsole m_console{0,0,100,50, 8, 16};
 
         std::thread m_WorkThread;
 

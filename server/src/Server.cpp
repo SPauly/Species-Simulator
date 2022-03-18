@@ -21,6 +21,12 @@ namespace sim
             return;
         }
 
+        std::cout << "Specify Window size x: ";
+        std::cin>>x;
+        std::cout <<"Specify window height y: ";
+        std::cin >> y;
+        m_console.create_console(0,0,x,y,8,16);
+
         while (true)
         {
             this->update(nMaxMesseges, bWait);
@@ -30,6 +36,7 @@ namespace sim
 
     void Server::on_client_validated(std::shared_ptr<net::Connection<params::MessageType>> client)
     {
+        test_console();
     }
 
     bool Server::on_client_connect(std::shared_ptr<sim::net::Connection<sim::params::MessageType>> client)
@@ -50,6 +57,25 @@ namespace sim
         switch (msg.header.id)
         {
         }
+    }
+
+    void Server::test_console()
+    {
+        sim::buffer m_buffer{x,y};
+        sim::types::rand random;
+
+        for(int i = 0; i < x; i++)
+        {
+            for(int ii = 0; ii < y; ii++)
+            {
+                if(random.get_rand(0,100) > 50)
+                {
+                    m_buffer.write_character(i,ii, '#');
+                }
+            }
+        }
+
+        m_console.write_buffer(m_console.get_active_handle(), m_buffer);
     }
 
     bool Server::mf_start_work_thread()

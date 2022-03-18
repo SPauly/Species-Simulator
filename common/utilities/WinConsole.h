@@ -7,11 +7,16 @@ namespace sim
 {
     struct buffer
     {
+        buffer();
         buffer(int, int);
         ~buffer();
+        
+        void write_character(int, int, const char&);
 
         CHAR_INFO *get_buffer();
 
+        int width = 0;
+        int height = 0;
         CHAR_INFO* char_buffer = nullptr;
     };
 
@@ -25,8 +30,9 @@ namespace sim
         bool create_console();
         bool create_console(int, int, int, int, int, int);
 
-        size_t write_buffer(CHAR_INFO*);
-        void fill_console();
+        size_t write_buffer(HANDLE, buffer&);
+
+        HANDLE& get_active_handle();
 
     private:
         int _nxpos = 0;
@@ -39,7 +45,7 @@ namespace sim
         SMALL_RECT _rectWindow;
         COORD coord;
 
-        buffer *_screen = nullptr;
+        buffer  _screen;
         HANDLE _hConsole;
         HANDLE _hConsoleOrigin;
         CONSOLE_SCREEN_BUFFER_INFO _csbi;

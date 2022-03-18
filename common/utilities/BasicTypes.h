@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <random>
 #include <windows.h>
 #include "Params.h"
 
@@ -39,9 +40,13 @@ namespace sim
             std::vector<Entity<sim::params::EntityType, sim::params::EntityStyle>> m_vecEntities;
         };
 
-        struct ConsoleStyle
+        class rand // only temporary
         {
-            
+        public:
+            rand(){};
+            ~rand(){};
+
+            int get_rand(size_t, size_t);
         };
     }
 }
