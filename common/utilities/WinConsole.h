@@ -1,4 +1,5 @@
 #pragma once
+#include "BasicTypes.h"
 #include <windows.h>
 #include <stdexcept>
 #include <algorithm>
@@ -29,6 +30,7 @@ namespace sim
 
         bool create_console();
         bool create_console(int, int, int, int, int, int);
+        bool create_console(sim::types::ConsoleLayout&);
 
         size_t write_buffer(HANDLE, buffer&);
 

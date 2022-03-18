@@ -18,7 +18,10 @@ namespace sim
             Server_Get_Ping,
             Server_Message,
             Server_Accept,
-            Server_Ping
+            Server_Ping,
+
+            Send_Console_Layout,
+            Send_Map
         };
 
         enum class MapType : uint8_t

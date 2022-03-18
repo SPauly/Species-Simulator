@@ -36,7 +36,13 @@ namespace sim
 
     void Server::on_client_validated(std::shared_ptr<net::Connection<params::MessageType>> client)
     {
-        test_console();
+        sim::net::Message<sim::params::MessageType> msg;
+        msg.header.id = sim::params::MessageType::Send_Console_Layout;
+        sim::types::ConsoleLayout cl;
+        cl._nScreenHeight = y;
+        cl._nScreenWidth = x;
+        msg << cl;
+        client->send(msg);
     }
 
     bool Server::on_client_connect(std::shared_ptr<sim::net::Connection<sim::params::MessageType>> client)

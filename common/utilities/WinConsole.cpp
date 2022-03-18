@@ -70,6 +70,18 @@ namespace sim
         return this->create_console();
     }
 
+    bool WinConsole::create_console(sim::types::ConsoleLayout& cl_)
+    {
+        _nxpos = cl_._nxpos;
+        _nypos = cl_._nypos;
+        _nScreenHeight = cl_._nScreenHeight;
+        _nScreenWidth = cl_._nScreenWidth;
+        _fontw = cl_._fontw;
+        _fonth = cl_._fonth;
+
+        return this->create_console();
+    }
+
     bool WinConsole::create_console()
     {
 
@@ -79,7 +91,7 @@ namespace sim
             return false;
 
         bSuccess = GetConsoleScreenBufferInfo(_hConsole, &_csbi);
-        
+
         coord = GetLargestConsoleWindowSize(_hConsole);
         // set physical window size
         _rectWindow.Left = (SHORT)_nxpos;
