@@ -21,6 +21,7 @@ namespace sim
         bool mf_start_work_thread();
         void mf_update_work();
 
+        void mf_get_config();
         void test_console();
 
     protected:

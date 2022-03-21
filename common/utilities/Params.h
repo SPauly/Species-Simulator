@@ -1,6 +1,8 @@
 #pragma once
 #include <cstdint>
 #include <string>
+#include <vector>
+#include <functional>
 
 namespace sim
 {
@@ -44,6 +46,26 @@ namespace sim
         {
             DOT = 46,
             HASH = 35
+        };
+
+        struct param
+        {
+            union{
+                uint8_t small_size;
+                uint32_t mittle_size;
+                uint64_t size;
+                char symbol;
+                } type_param;
+            std::string name;
+            std::function<bool(type_param)> &lambda;
+        };
+
+        class config
+        {
+            std::vector<param> vec_params{
+                {param::mittle_size = 0, "Name", [this](param::type_param){ return }}
+            };
+
         };
     }
 }

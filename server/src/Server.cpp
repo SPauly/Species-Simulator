@@ -7,6 +7,11 @@ namespace sim
     {
     }
 
+    void Server::mf_get_config()
+    {
+        
+    }
+
     void Server::run(size_t nMaxMesseges = -1, bool bWait = false)
     {
         if (!this->start_server())
@@ -30,7 +35,6 @@ namespace sim
         while (true)
         {
             this->update(nMaxMesseges, bWait);
-            this->mf_update_work();
         }
     }
 
@@ -94,8 +98,8 @@ namespace sim
         // start work in thread
         try
         {
-            //m_WorkThread = std::thread([this]()
-            //                           { mf_update_work(); });
+            m_WorkThread = std::thread([this]()
+                                       { mf_update_work(); });
         }
         catch (const std::exception &e)
         {
@@ -107,5 +111,7 @@ namespace sim
     }
     void Server::mf_update_work()
     {
+        if(m_WorkThread.joinable())
+            m_WorkThread.join();
     }
 }
