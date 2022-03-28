@@ -23,7 +23,7 @@ namespace sim
             Server_Ping,
 
             Send_Console_Layout,
-            Send_Map
+            Send_Map_Layout
         };
 
         enum class MapType : uint8_t
@@ -33,13 +33,19 @@ namespace sim
             Left_Open,
             Top_Open,
             Bottom_Open,
-            Environment
+            HAS_FILL
+        };
+
+        struct MapConfig 
+        {
+            uint16_t width = 0;
+            uint16_t height = 0;
         };
         
     	enum class EntityType : uint8_t
         {
             Player,
-            Wall
+            Object
         };
 
         enum class EntityStyle : uint8_t
@@ -57,15 +63,11 @@ namespace sim
                 char symbol;
                 } type_param;
             std::string name;
-            std::function<bool(type_param)> &lambda;
+            std::function<bool(int)> &lambda;
         };
-
+ 
         class config
         {
-            std::vector<param> vec_params{
-                {param::mittle_size = 0, "Name", [this](param::type_param){ return }}
-            };
-
         };
     }
 }

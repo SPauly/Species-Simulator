@@ -36,6 +36,8 @@ namespace sim
         {
             this->update(nMaxMesseges, bWait);
         }
+        if(m_WorkThread.joinable())
+            m_WorkThread.join();
     }
 
     void Server::on_client_validated(std::shared_ptr<net::Connection<params::MessageType>> client)
@@ -44,6 +46,8 @@ namespace sim
         std::cin>>x;
         std::cout <<"Specify window height y: ";
         std::cin >> y;
+
+        //send Window
         sim::net::Message<sim::params::MessageType> msg;
         msg.header.id = sim::params::MessageType::Send_Console_Layout;
         sim::types::ConsoleLayout cl;
@@ -51,6 +55,13 @@ namespace sim
         cl._nScreenWidth = x;
         msg << cl;
         client->send(msg);
+
+        //send Map
+        sim::net::Message<sim::params::MessageType> map_msg;
+        map_msg.header.id = sim::params::MessageType::Send_Map_Layout;
+        sim::params::MapConfig map_config{x,y};
+        map_msg << map_config;
+        client->send(map_msg);
     }
 
     bool Server::on_client_connect(std::shared_ptr<sim::net::Connection<sim::params::MessageType>> client)
@@ -75,7 +86,7 @@ namespace sim
 
     void Server::test_console()
     {
-        sim::buffer m_buffer{x,y};
+        sim::TSConsoleBuffer m_buffer{x,y};
         sim::types::rand random;
 
         for(int i = 0; i < x; i++)
@@ -111,7 +122,5 @@ namespace sim
     }
     void Server::mf_update_work()
     {
-        if(m_WorkThread.joinable())
-            m_WorkThread.join();
     }
 }

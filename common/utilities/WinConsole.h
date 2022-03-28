@@ -6,11 +6,11 @@
 
 namespace sim
 {
-    struct buffer
+    struct TSConsoleBuffer
     {
-        buffer();
-        buffer(int, int);
-        ~buffer();
+        TSConsoleBuffer();
+        TSConsoleBuffer(int, int);
+        ~TSConsoleBuffer();
         
         void write_character(int, int, const char&);
 
@@ -32,7 +32,7 @@ namespace sim
         bool create_console(int, int, int, int, int, int);
         bool create_console(sim::types::ConsoleLayout&);
 
-        size_t write_buffer(HANDLE, buffer&);
+        size_t write_buffer(HANDLE, TSConsoleBuffer&);
 
         HANDLE& get_active_handle();
 
@@ -47,7 +47,7 @@ namespace sim
         SMALL_RECT _rectWindow;
         COORD coord;
 
-        buffer  _screen;
+        TSConsoleBuffer  _screen;
         HANDLE _hConsole;
         HANDLE _hConsoleOrigin;
         CONSOLE_SCREEN_BUFFER_INFO _csbi;

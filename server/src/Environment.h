@@ -13,7 +13,5 @@ namespace sim
         ~Environment();
 
     private:  
-        std::vector<sim::types::Map<sim::params::MapType>> m_maps;
-    
     };
 }

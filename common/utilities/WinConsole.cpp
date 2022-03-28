@@ -1,7 +1,7 @@
 #include "WinConsole.h"
 namespace sim
 {
-    buffer::buffer(int width_, int height_) : width(width_), height(height_)
+    TSConsoleBuffer::TSConsoleBuffer(int width_, int height_) : width(width_), height(height_)
     {
         char_buffer = new CHAR_INFO[width * height];
         for (int i = 0; i < width - 1; i++)
@@ -14,21 +14,21 @@ namespace sim
         }
     }
 
-    buffer::buffer() : buffer::buffer(1, 1)
+    TSConsoleBuffer::TSConsoleBuffer() : TSConsoleBuffer::TSConsoleBuffer(1, 1)
     {
     }
 
-    buffer::~buffer()
+    TSConsoleBuffer::~TSConsoleBuffer()
     {
         delete[] char_buffer;
     }
 
-    CHAR_INFO *buffer::get_buffer()
+    CHAR_INFO *TSConsoleBuffer::get_buffer()
     {
         return char_buffer;
     }
 
-    void buffer::write_character(int xpos_, int ypos_, const char &ch_)
+    void TSConsoleBuffer::write_character(int xpos_, int ypos_, const char &ch_)
     {
         if (xpos_ >= 0 && xpos_ < width && ypos_ >= 0 && ypos_ < height)
         {
@@ -122,7 +122,7 @@ namespace sim
         return bSuccess;
     }
 
-    size_t WinConsole::write_buffer(HANDLE handle_, buffer &buf_)
+    size_t WinConsole::write_buffer(HANDLE handle_, TSConsoleBuffer &buf_)
     {
         if (handle_ == INVALID_HANDLE_VALUE)
             return 0;

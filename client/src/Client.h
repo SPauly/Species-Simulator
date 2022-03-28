@@ -3,6 +3,7 @@
 #include "BasicTypes.h"
 #include "Params.h"
 #include "WinConsole.h"
+#include "Map.h"
 
 namespace sim
 {
@@ -11,7 +12,7 @@ namespace sim
     public:
         void run();
     private:
-        sim::WinConsole m_console{0,0,60,30,8,16};
+        std::shared_ptr<sim::WinConsole> m_console;
         sim::types::ConsoleLayout cl;
     };
 }
