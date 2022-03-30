@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <initializer_list>
 
 namespace sim
 {
@@ -26,20 +27,28 @@ namespace sim
             Send_Map_Layout
         };
 
-        enum class MapType : uint8_t
+        enum MapType : uint8_t
         {
-            Standalone,
-            Right_Open,
-            Left_Open,
-            Top_Open,
-            Bottom_Open,
+            No_Walls,
+            Right_Wall,
+            Left_Wall,
+            Top_Wall,
+            Bottom_Wall,
             HAS_FILL
         };
 
         struct MapConfig 
         {
+            uint16_t x = 0;
+            uint16_t y = 0;
             uint16_t width = 0;
             uint16_t height = 0;
+            
+            //converted to MapType
+            uint8_t WallOne = 0;
+            uint8_t WallTwo = 0;
+            uint8_t WallThree = 0;
+            uint8_t WallFour = 0;
         };
         
     	enum class EntityType : uint8_t

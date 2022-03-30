@@ -59,7 +59,7 @@ namespace sim
         //send Map
         sim::net::Message<sim::params::MessageType> map_msg;
         map_msg.header.id = sim::params::MessageType::Send_Map_Layout;
-        sim::params::MapConfig map_config{x,y};
+        sim::params::MapConfig map_config{0,0,x,y,{sim::params::MapType::Bottom_Wall, sim::params::MapType::Top_Wall}};
         map_msg << map_config;
         client->send(map_msg);
     }

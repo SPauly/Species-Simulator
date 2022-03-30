@@ -24,7 +24,7 @@ namespace sim
                         break;
                     case sim::params::MessageType::Send_Map_Layout:
                         msg >> map_config;
-                        map = std::make_shared<sim::Map>(m_console, map_config, sim::params::MapType::Left_Open);
+                        map = std::make_shared<sim::Map>(m_console, map_config);
                         break;
                     default:
                         break;

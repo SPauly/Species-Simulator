@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <initializer_list>
+#include "stdarg.h"
 #include "Params.h"
 #include "WinConsole.h"
 
@@ -23,11 +25,13 @@ namespace sim
     {
     public:
         Map() = delete;
-        Map(std::shared_ptr<sim::WinConsole>, sim::params::MapConfig &, sim::params::MapType);
+        Map(std::shared_ptr<sim::WinConsole>, sim::params::MapConfig &);
         virtual ~Map();
 
+        void print_row(int, int, int, int, const char*);
+
     private:
-        sim::params::MapConfig &mref_config;
+        sim::params::MapConfig &m_config;
 
         sim::params::MapType m_opening;
 
