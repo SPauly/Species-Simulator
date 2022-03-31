@@ -28,7 +28,7 @@ namespace sim
         Map(std::shared_ptr<sim::WinConsole>, sim::params::MapConfig &);
         virtual ~Map();
 
-        void print_row(int, int, int, int, const char*);
+        void draw_line(int, int, int, int, const char&);
 
     private:
         sim::params::MapConfig &m_config;

@@ -12,39 +12,77 @@ namespace sim
         case params::MapType::No_Walls:
             break;
         case params::MapType::Right_Wall:
-        {
-            // draw right
-            for (int i = 0; i < m_config.height - 1; i++)
-            {
-                m_buffer->write_character((m_config.width - 1), i, '|');
-            }
-        }
-        break;
+            draw_line(m_config.width - 1, 0, m_config.width - 1, m_config.height - 1, '|');
+            break;
         case params::MapType::Left_Wall:
-        {
-            // draw right
-            for (int i = 0; i < m_config.height - 1; i++)
-            {
-                m_buffer->write_character(0, i, '|');
-            }
-        }
-        break;
+            draw_line(0, 0, 0, m_config.height - 1, '|');
+            break;
         case params::MapType::Top_Wall:
-        { // draw top
-            for (int i = 0; i < m_config.width; i++)
-            {
-                m_buffer->write_character(i, 0, '-');
-            }
-        }
-        break;
+            draw_line(0, 0, m_config.width - 1, 0, '-');
+            break;
         case params::MapType::Bottom_Wall:
-        { // draw button
-            for (int i = 0; i < m_config.width; i++)
-            {
-                m_buffer->write_character(i, (m_config.height - 1), '-');
-            }
+            draw_line(0, m_config.height - 1, m_config.width - 1, m_config.height - 1, '-');
+            break;
+        default:
+            break;
         }
-        break;
+
+        switch (m_config.WallTwo)
+        {
+        case params::MapType::No_Walls:
+            break;
+        case params::MapType::Right_Wall:
+            draw_line(m_config.width - 1, 0, m_config.width - 1, m_config.height - 1, '|');
+            break;
+        case params::MapType::Left_Wall:
+            draw_line(0, 0, 0, m_config.height - 1, '|');
+            break;
+        case params::MapType::Top_Wall:
+            draw_line(0, 0, m_config.width - 1, 0, '-');
+            break;
+        case params::MapType::Bottom_Wall:
+            draw_line(0, m_config.height - 1, m_config.width - 1, m_config.height - 1, '-');
+            break;
+        default:
+            break;
+        }
+
+        switch (m_config.WallThree)
+        {
+        case params::MapType::No_Walls:
+            break;
+        case params::MapType::Right_Wall:
+            draw_line(m_config.width - 1, 0, m_config.width - 1, m_config.height - 1, '|');
+            break;
+        case params::MapType::Left_Wall:
+            draw_line(0, 0, 0, m_config.height - 1, '|');
+            break;
+        case params::MapType::Top_Wall:
+            draw_line(0, 0, m_config.width - 1, 0, '-');
+            break;
+        case params::MapType::Bottom_Wall:
+            draw_line(0, m_config.height - 1, m_config.width - 1, m_config.height - 1, '-');
+            break;
+        default:
+            break;
+        }
+
+        switch (m_config.WallFour)
+        {
+        case params::MapType::No_Walls:
+            break;
+        case params::MapType::Right_Wall:
+            draw_line(m_config.width - 1, 0, m_config.width - 1, m_config.height - 1, '|');
+            break;
+        case params::MapType::Left_Wall:
+            draw_line(0, 0, 0, m_config.height - 1, '|');
+            break;
+        case params::MapType::Top_Wall:
+            draw_line(0, 0, m_config.width - 1, 0, '-');
+            break;
+        case params::MapType::Bottom_Wall:
+            draw_line(0, m_config.height - 1, m_config.width - 1, m_config.height - 1, '-');
+            break;
         default:
             break;
         }
@@ -56,11 +94,36 @@ namespace sim
     {
     }
 
-    void Map::print_row(int _x, int _y, int _w, int _h, const char *_symb)
+    void Map::draw_line(int _x, int _y, int _w, int _h, const char &_symb)
     {
-        for (int i = 0; i < m_config.width; i++)
+        // make sure the starting point is closer to 0,0 than the destination point
+        if (_x > _w)
+            _x = _w;
+        if (_y > _h)
+            _y = _h;
+
+        // make sure no diagonals are included
+        if (_x != _w)
+            if (_y != _h)
+                _y = _h;
+
+        // calculate difference between points
+        int dif_x = _w - _x;
+        int dif_y = _h - _y;
+
+        // make sure they don't exceed boundaries
+        if (_x + dif_x > m_config.width - 1)
+            dif_x = m_config.width - 1 - _x;
+        if (_y + dif_y > m_config.height - 1)
+            dif_y = m_config.height - 1 - _y;
+
+        for (int r = 0; r <= dif_x; r++)
         {
-            m_buffer->write_character(i, (m_config.height - 1), '-');
+            m_buffer->write_character(_x + r, _y, _symb);
+        }
+        for (int c = 0; c <= dif_y; c++)
+        {
+            m_buffer->write_character(_x, _y + c, _symb);
         }
     }
 }
