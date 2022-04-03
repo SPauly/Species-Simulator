@@ -18,14 +18,29 @@ namespace sim
             int get_rand(size_t, size_t);
         };
 
-        struct ConsoleLayout
+        //type used by Map instance 
+        enum MapType : uint8_t
         {
-            int _nxpos = 0;
-            int _nypos = 0;
-            int _nScreenWidth = 60;
-            int _nScreenHeight = 60;
-            int _fontw = 8;
-            int _fonth = 16;
+            No_Walls,
+            Right_Wall,
+            Left_Wall,
+            Top_Wall,
+            Bottom_Wall,
+            HAS_FILL
+        };
+
+        //Type of Entity
+      	enum class EntityType : uint8_t
+        {
+            Player,
+            Object
+        };
+
+        //Type of Entity Style
+        enum class EntityStyle : uint8_t
+        {
+            DOT = 46,
+            HASH = 35
         };
     }
 }

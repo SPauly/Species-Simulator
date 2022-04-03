@@ -6,6 +6,7 @@
 #include <initializer_list>
 #include "stdarg.h"
 #include "Params.h"
+#include "BasicTypes.h"
 #include "WinConsole.h"
 
 namespace sim
@@ -26,19 +27,23 @@ namespace sim
     public:
         Map() = delete;
         Map(std::shared_ptr<sim::WinConsole>, sim::params::MapConfig &);
+        Map(std::shared_ptr<sim::WinConsole>, sim::params::MapConfig &, sim::params::WinConsoleLayout &);
         virtual ~Map();
 
         void draw_line(int, int, int, int, const char&);
+        sim::params::MapConfig& get_config();
 
-    private:
-        sim::params::MapConfig &m_config;
-
-        sim::params::MapType m_opening;
-
+    protected:
         std::shared_ptr<sim::TSConsoleBuffer> m_buffer;
 
         std::shared_ptr<sim::WinConsole> m_console;
+    
+    private:
+        sim::params::MapConfig m_config;
+        sim::params::WinConsoleLayout m_conLay;
 
-        std::vector<Entity<sim::params::EntityType, sim::params::EntityStyle>> m_vecEntities;
+        sim::types::MapType m_opening;
+
+        std::vector<Entity<sim::types::EntityType, sim::types::EntityStyle>> m_vecEntities;
     };
 }

@@ -9,10 +9,9 @@ namespace sim
 {
     namespace params
     {
-
+        //Message Header Type
         enum class MessageType : uint8_t
         {
-            Client_Accepted,
             Client_Assigne_ID,
             Client_Register_With_Server,
             Client_Unregister_With_Server,
@@ -21,22 +20,25 @@ namespace sim
             Server_Get_Ping,
             Server_Message,
             Server_Accept,
+            Server_Denial,
             Server_Ping,
 
-            Send_Console_Layout,
-            Send_Map_Layout
+            Send_Console_Layout, //WinConsoleLayout Type
+            Send_Map_Layout //MapConfig Type 
         };
 
-        enum MapType : uint8_t
+        //WinConsole Layout Messsage type
+        struct WinConsoleLayout
         {
-            No_Walls,
-            Right_Wall,
-            Left_Wall,
-            Top_Wall,
-            Bottom_Wall,
-            HAS_FILL
+            int _nxpos = 0;
+            int _nypos = 0;
+            int _nScreenWidth = 60;
+            int _nScreenHeight = 60;
+            int _fontw = 8;
+            int _fonth = 16;
         };
 
+        //Message for sending Map Configuration
         struct MapConfig 
         {
             uint16_t x = 0;
@@ -49,18 +51,6 @@ namespace sim
             uint8_t WallTwo = 0;
             uint8_t WallThree = 0;
             uint8_t WallFour = 0;
-        };
-        
-    	enum class EntityType : uint8_t
-        {
-            Player,
-            Object
-        };
-
-        enum class EntityStyle : uint8_t
-        {
-            DOT = 46,
-            HASH = 35
         };
 
         struct param

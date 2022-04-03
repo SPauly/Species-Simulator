@@ -7,14 +7,17 @@
 
 namespace sim
 {
-    static constexpr int MAX_MAPCOUNT = 9;
+    static constexpr int MAX_MAPCOUNT = 2;
     static constexpr int DEFAULT_MAP_COUNT = 2;
 
-    class Environment 
+    class Environment : public Map
     {
     public:
-        Environment();
+        Environment(std::shared_ptr<sim::WinConsole>, sim::params::MapConfig &, int);
         virtual ~Environment();
+
+        void instanciate_maps();
+        sim::params::MapConfig& at_get_config(const size_t&);
 
     private:
         int m_map_width = 0;
@@ -22,7 +25,7 @@ namespace sim
 
         int m_map_count = DEFAULT_MAP_COUNT;
 
-
         std::vector<sim::Map> m_maps;
+        sim::params::WinConsoleLayout m_maps_conLayout;
     };
 }

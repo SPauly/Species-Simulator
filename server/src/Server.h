@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <thread>
+#include <memory>
 #include "NetInclude.h"
 #include "Params.h"
 #include "Environment.h"
@@ -14,8 +15,6 @@ namespace sim
         Server(uint16_t, size_t);
 
         void run(size_t, bool); //arg: Max Number of Messages processed, bwait, number of Maps/Clients calls start_server, update Server and runs server
-        
-        virtual void on_client_validated(std::shared_ptr<net::Connection<params::MessageType>>) override;
 
     private:    
         bool mf_start_work_thread();
@@ -23,6 +22,9 @@ namespace sim
 
         void mf_get_config();
         void test_console();
+
+    public:
+        virtual void on_client_validated(std::shared_ptr<net::Connection<params::MessageType>>) override;
 
     protected:
         virtual bool on_client_connect(std::shared_ptr<sim::net::Connection<sim::params::MessageType>>) override;
@@ -32,13 +34,15 @@ namespace sim
     private:
         //window dependencies
         int x,y;
-    	sim::WinConsole m_console{0,0,100,50, 8, 16};
+    	std::shared_ptr<sim::WinConsole> m_console;
 
+        //work thread
         std::thread m_WorkThread;
 
-        size_t m_nMapsCount = 0;
-
-        sim::Environment m_environment{};
+        //environment related
+        size_t m_nMapsCount = sim::DEFAULT_MAP_COUNT;
+        sim::params::MapConfig m_mapConfig{0,0,0,0,sim::types::MapType::No_Walls};
+        std::unique_ptr<sim::Environment> m_environment;
     };
 
 }

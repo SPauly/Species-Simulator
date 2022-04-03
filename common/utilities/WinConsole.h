@@ -1,5 +1,6 @@
 #pragma once
 #include "BasicTypes.h"
+#include "Params.h"
 #include <windows.h>
 #include <stdexcept>
 #include <algorithm>
@@ -30,19 +31,17 @@ namespace sim
 
         bool create_console();
         bool create_console(int, int, int, int, int, int);
-        bool create_console(sim::types::ConsoleLayout&);
+        bool create_console(sim::params::WinConsoleLayout&);
 
         size_t write_buffer(HANDLE, TSConsoleBuffer&);
+        size_t write_buffer(HANDLE, TSConsoleBuffer&, sim::params::WinConsoleLayout&);
 
         HANDLE& get_active_handle();
+        sim::params::WinConsoleLayout& get_layout();
 
     private:
-        int _nxpos = 0;
-        int _nypos = 0;
-        int _nScreenWidth = 60;
-        int _nScreenHeight = 60;
-        int _fontw = 8;
-        int _fonth = 16;
+
+        sim::params::WinConsoleLayout _layout;
 
         SMALL_RECT _rectWindow;
         COORD coord;

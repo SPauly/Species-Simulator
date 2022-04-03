@@ -13,6 +13,6 @@ namespace sim
         void run();
     private:
         std::shared_ptr<sim::WinConsole> m_console;
-        sim::types::ConsoleLayout cl;
+        sim::params::WinConsoleLayout cl;
     };
 }
