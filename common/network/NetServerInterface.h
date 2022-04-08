@@ -194,6 +194,10 @@ namespace sim
             virtual void on_client_validated(std::shared_ptr<Connection<T>> client) // gets called when client is validated
             {
             }
+
+            size_t get_connections() {
+                return m_deqConnections.size();
+            }
         private:
             asio::io_context m_AsioContext;
             std::thread m_ContextThread;
