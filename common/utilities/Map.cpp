@@ -11,6 +11,10 @@ namespace sim
     Map::Map(std::shared_ptr<sim::WinConsole> console, sim::params::MapConfig &config, std::shared_ptr<sim::TSConsoleBuffer> buffer)
         : m_console(console), m_config(config), m_buffer(buffer)
     {
+        //set console layout
+        m_conLay._nScreenWidth = config.width;
+        m_conLay._nScreenHeight = config.height;
+        
         //validate offset 
         if(m_config.width + m_config.x > m_console->get_layout()._nScreenWidth)
             m_config.x = m_console->get_layout()._nScreenWidth - m_config.width;
@@ -127,10 +131,12 @@ namespace sim
         if (_y + dif_y > m_config.height - 1)
             dif_y = m_config.height - 1 - _y;
 
+        //first print rows
         for (int r = 0; r <= dif_x; r++)
         {
             m_buffer->write_character((_x + r + m_config.x), _y + m_config.y, _symb);
         }
+        //then columns
         for (int c = 0; c <= dif_y; c++)
         {
             m_buffer->write_character(_x + m_config.x, (_y + c + m_config.y), _symb);
@@ -140,5 +146,9 @@ namespace sim
     sim::params::MapConfig& Map::get_config()
     {
         return m_config;
+    }
+    sim::params::WinConsoleLayout& Map::get_layout()
+    {
+        return m_conLay;
     }
 }

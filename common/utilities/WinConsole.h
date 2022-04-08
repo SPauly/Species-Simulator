@@ -33,7 +33,7 @@ namespace sim
         bool create_console(int, int, int, int, int, int);
         bool create_console(sim::params::WinConsoleLayout&);
 
-        size_t write_buffer(HANDLE, TSConsoleBuffer&);
+        size_t write_buffer(HANDLE, TSConsoleBuffer&); /*prefered function since the overload is untested so far */
         size_t write_buffer(HANDLE, TSConsoleBuffer&, sim::params::WinConsoleLayout&);
 
         HANDLE& get_active_handle();

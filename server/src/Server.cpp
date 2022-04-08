@@ -6,11 +6,13 @@ namespace sim
     Server::Server(uint16_t nport_, size_t nmapSize_) : sim::net::Server_Interface<sim::params::MessageType>(nport_),
                                                         m_nMapsCount(nmapSize_)
     {
+        //set screen with to full hd with font size 8x16 pixels
         x = 240;
         y = 66;
         m_console = std::make_shared<sim::WinConsole>(0,0,x,y,8,16);
         m_envConfig.width = x;
-        m_envConfig.height = y;
+        m_envConfig.height = 50;
+        //create environment with the specific coordinates
         m_environment = std::make_unique<sim::Environment>(m_console, m_envConfig, m_nMapsCount);
         m_environment->instanciate_maps();
     }
@@ -48,16 +50,13 @@ namespace sim
         // send Window
         sim::net::Message<sim::params::MessageType> msg;
         msg.header.id = sim::params::MessageType::Send_Console_Layout;
-        sim::params::WinConsoleLayout cl;
-        cl._nScreenHeight = y / m_nMapsCount;
-        cl._nScreenWidth = x / m_nMapsCount;
-        msg << cl;
+        msg << m_environment->at_get_map(this->get_connections() - 1).get_layout();
         client->send(msg);
 
         // send Map
         sim::net::Message<sim::params::MessageType> map_msg;
         map_msg.header.id = sim::params::MessageType::Send_Map_Layout;
-        map_msg << m_environment->at_get_config(this->get_connections() - 1);
+        map_msg << m_environment->at_get_map(this->get_connections() - 1).get_config();
         client->send(map_msg);
     }
 

@@ -1,4 +1,5 @@
 #include "Environment.h"
+#include "BasicTypes.h"
 
 namespace sim
 {
@@ -14,7 +15,7 @@ namespace sim
     {
         //instantiate dimensions of each map
         m_map_width = m_config.width / m_map_count;
-        m_map_height = m_config.height / m_map_count;
+        m_map_height = m_config.height;
         
         //scale buffer to provide space for all maps
         m_buffer = std::make_shared<sim::TSConsoleBuffer>(m_config.width, m_config.height);
@@ -24,6 +25,7 @@ namespace sim
         temp_config.WallOne = sim::types::MapType::Bottom_Wall;
         temp_config.WallTwo = sim::types::MapType::Top_Wall;
 
+        //decide on weather to draw left or right wall
         for(int i = 0; i < m_map_count; i++)
         {
             if(i % 2 > 0)
@@ -31,14 +33,14 @@ namespace sim
             else
                 temp_config.WallThree = sim::types::MapType::Left_Wall;
 
-            //set offsets in Mapconfig
+            //set offset in Mapconfig
             temp_config.x = i * m_map_width;
             m_maps.push_back({m_console, temp_config, m_buffer});
         }
     }
 
-    sim::params::MapConfig& Environment::at_get_config(const size_t& pos)
+    sim::Map& Environment::at_get_map(const size_t& pos)
     {
-        return m_maps.at(pos).get_config();
+        return m_maps.at(pos);
     }
 }

@@ -32,6 +32,7 @@ namespace sim
 
         void draw_line(int, int, int, int, const char&);
         sim::params::MapConfig& get_config();
+        sim::params::WinConsoleLayout& get_layout();
 
     protected:
         sim::params::MapConfig m_config;

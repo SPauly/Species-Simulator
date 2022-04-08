@@ -2,7 +2,6 @@
 #include <cstdint>
 #include <vector>
 #include "Params.h"
-#include "BasicTypes.h"
 #include "Map.h"
 
 namespace sim
@@ -17,7 +16,7 @@ namespace sim
         virtual ~Environment();
 
         void instanciate_maps();
-        sim::params::MapConfig& at_get_config(const size_t&);
+        sim::Map& at_get_map(const size_t&);
 
     private:
         int m_map_width = 0;
