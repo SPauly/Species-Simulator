@@ -3,14 +3,21 @@
 
 namespace sim
 {
-    Map::Map(std::shared_ptr<sim::WinConsole> console, sim::params::MapConfig &config) : Map(console, config, console->get_layout())
+    Map::Map(std::shared_ptr<sim::WinConsole> console, sim::params::MapConfig &config) 
+        : Map(console,config, std::make_shared<sim::TSConsoleBuffer>(config.width, config.height))
     {
     }
-    Map::Map(std::shared_ptr<sim::WinConsole> console, sim::params::MapConfig &config, sim::params::WinConsoleLayout &_layout) 
-        : m_console(console), m_config(config), m_conLay(_layout)
-    {
-        m_buffer = std::make_shared<sim::TSConsoleBuffer>(m_config.width, m_config.height);
 
+    Map::Map(std::shared_ptr<sim::WinConsole> console, sim::params::MapConfig &config, std::shared_ptr<sim::TSConsoleBuffer> buffer)
+        : m_console(console), m_config(config), m_buffer(buffer)
+    {
+        //validate offset 
+        if(m_config.width + m_config.x > m_console->get_layout()._nScreenWidth)
+            m_config.x = m_console->get_layout()._nScreenWidth - m_config.width;
+        if(m_config.height + m_config.y > m_console->get_layout()._nScreenHeight)
+            m_config.y = m_console->get_layout()._nScreenHeight - m_config.height;
+
+        //draw the walls
         switch (m_config.WallOne)
         {
         case types::MapType::No_Walls:
@@ -91,7 +98,7 @@ namespace sim
             break;
         }
 
-        m_console->write_buffer(m_console->get_active_handle(), *m_buffer, m_conLay);
+        m_console->write_buffer(m_console->get_active_handle(), *m_buffer);
     }
     Map::~Map()
     {
@@ -120,13 +127,13 @@ namespace sim
         if (_y + dif_y > m_config.height - 1)
             dif_y = m_config.height - 1 - _y;
 
-        for (int r = 0; r < dif_x; r++)
+        for (int r = 0; r <= dif_x; r++)
         {
-            m_buffer->write_character(_x + r, _y, _symb);
+            m_buffer->write_character((_x + r + m_config.x), _y + m_config.y, _symb);
         }
-        for (int c = 0; c < dif_y; c++)
+        for (int c = 0; c <= dif_y; c++)
         {
-            m_buffer->write_character(_x, _y + c, _symb);
+            m_buffer->write_character(_x + m_config.x, (_y + c + m_config.y), _symb);
         }
     }
 

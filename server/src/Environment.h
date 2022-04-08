@@ -26,6 +26,5 @@ namespace sim
         int m_map_count = DEFAULT_MAP_COUNT;
 
         std::vector<sim::Map> m_maps;
-        sim::params::WinConsoleLayout m_maps_conLayout;
     };
 }

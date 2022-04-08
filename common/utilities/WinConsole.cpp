@@ -84,6 +84,9 @@ namespace sim
 
         if (_hConsole == INVALID_HANDLE_VALUE)
             return false;
+            
+        //get screenbuffeer info
+        bSuccess = GetConsoleScreenBufferInfo(_hConsole, &_csbi);
 
         // set physical window size
         coord = GetLargestConsoleWindowSize(_hConsole);
@@ -95,9 +98,6 @@ namespace sim
         //set window to minimal size
         SMALL_RECT const minimal_window = {0,0,1,1};    
         bSuccess = SetConsoleWindowInfo(_hConsole, TRUE, &minimal_window);
-
-        //get screenbuffeer info
-        bSuccess = GetConsoleScreenBufferInfo(_hConsole, &_csbi);
 
         // set console screenbuffer
         coord.X = _layout._nScreenWidth;
@@ -135,7 +135,7 @@ namespace sim
         else
             return 0;
 
-        WriteConsoleOutput(handle_, _screen.get_buffer(), {(SHORT)_layout._nScreenWidth, (SHORT)_layout._nScreenHeight}, {0, 0}, &_rectWindow);
+        WriteConsoleOutput(handle_, _screen.get_buffer(), {(SHORT)_screen.width, (SHORT)_screen.height}, {0, 0}, &_rectWindow);
     }
 
     size_t WinConsole::write_buffer(HANDLE handle_, TSConsoleBuffer &buf_, sim::params::WinConsoleLayout &conLay_)
@@ -148,7 +148,7 @@ namespace sim
         else
             return 0;
 
-        WriteConsoleOutput(handle_, _screen.get_buffer(), {(SHORT)conLay_._nScreenWidth, (SHORT)conLay_._nScreenHeight}, {0, 0}, &_rectWindow);
+        WriteConsoleOutput(handle_, _screen.get_buffer(), {(SHORT)conLay_._nScreenWidth, (SHORT)conLay_._nScreenHeight}, {(SHORT)conLay_._nxpos, (SHORT)conLay_._nypos}, &_rectWindow);
     }
 
     HANDLE &WinConsole::get_active_handle()

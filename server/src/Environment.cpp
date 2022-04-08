@@ -12,12 +12,14 @@ namespace sim
 
     void Environment::instanciate_maps()
     {
-        m_map_width = m_console->get_layout()._nScreenWidth / m_map_count;
-        m_map_height = m_console->get_layout()._nScreenHeight / m_map_count;
+        //instantiate dimensions of each map
+        m_map_width = m_config.width / m_map_count;
+        m_map_height = m_config.height / m_map_count;
+        
+        //scale buffer to provide space for all maps
+        m_buffer = std::make_shared<sim::TSConsoleBuffer>(m_config.width, m_config.height);
 
-        m_maps_conLayout._nScreenWidth = m_map_width;
-        m_maps_conLayout._nScreenHeight = m_map_height;
-
+        //initiate layout for the maps
         sim::params::MapConfig temp_config{0,0, m_map_width, m_map_height};
         temp_config.WallOne = sim::types::MapType::Bottom_Wall;
         temp_config.WallTwo = sim::types::MapType::Top_Wall;
@@ -25,11 +27,13 @@ namespace sim
         for(int i = 0; i < m_map_count; i++)
         {
             if(i % 2 > 0)
-                temp_config.WallThree = sim::types::MapType::Left_Wall;
-            else
                 temp_config.WallThree = sim::types::MapType::Right_Wall;
+            else
+                temp_config.WallThree = sim::types::MapType::Left_Wall;
 
-            m_maps.push_back({m_console, temp_config, m_maps_conLayout});
+            //set offsets in Mapconfig
+            temp_config.x = i * m_map_width;
+            m_maps.push_back({m_console, temp_config, m_buffer});
         }
     }
 

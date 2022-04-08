@@ -1,20 +1,17 @@
 #include "Server.h"
+#include <chrono>
 
 namespace sim
 {
     Server::Server(uint16_t nport_, size_t nmapSize_) : sim::net::Server_Interface<sim::params::MessageType>(nport_),
                                                         m_nMapsCount(nmapSize_)
     {
-        m_console = std::make_shared<sim::WinConsole>(0,0,100,50,8,16);
-        std::cout << "Specify Window size x: ";
-        std::cin >> x;
-        std::cout << "Specify window height y: ";
-        std::cin >> y;
-        
-        m_console->create_console(0,0,x,y,8,16);
-        m_mapConfig.width = x;
-        m_mapConfig.height = y;
-        m_environment = std::make_unique<sim::Environment>(m_console, m_mapConfig, m_nMapsCount);
+        x = 240;
+        y = 66;
+        m_console = std::make_shared<sim::WinConsole>(0,0,x,y,8,16);
+        m_envConfig.width = x;
+        m_envConfig.height = y;
+        m_environment = std::make_unique<sim::Environment>(m_console, m_envConfig, m_nMapsCount);
         m_environment->instanciate_maps();
     }
 
@@ -66,7 +63,7 @@ namespace sim
 
     bool Server::on_client_connect(std::shared_ptr<sim::net::Connection<sim::params::MessageType>> client)
     {
-        if (this->get_connections() + 1 < m_nMapsCount)
+        if (this->get_connections() < m_nMapsCount)
         {
             sim::net::Message<sim::params::MessageType> msg;
             msg.header.id = sim::params::MessageType::Server_Accept;
@@ -79,6 +76,7 @@ namespace sim
             msg.header.id = sim::params::MessageType::Server_Denial;
             msg << "Max Clients connected";
             client->send(msg);
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));
             return false;
         }
     }

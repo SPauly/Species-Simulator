@@ -27,19 +27,19 @@ namespace sim
     public:
         Map() = delete;
         Map(std::shared_ptr<sim::WinConsole>, sim::params::MapConfig &);
-        Map(std::shared_ptr<sim::WinConsole>, sim::params::MapConfig &, sim::params::WinConsoleLayout &);
+        Map(std::shared_ptr<sim::WinConsole>, sim::params::MapConfig &, std::shared_ptr<sim::TSConsoleBuffer>);
         virtual ~Map();
 
         void draw_line(int, int, int, int, const char&);
         sim::params::MapConfig& get_config();
 
     protected:
+        sim::params::MapConfig m_config;
         std::shared_ptr<sim::TSConsoleBuffer> m_buffer;
-
         std::shared_ptr<sim::WinConsole> m_console;
     
     private:
-        sim::params::MapConfig m_config;
+        
         sim::params::WinConsoleLayout m_conLay;
 
         sim::types::MapType m_opening;
