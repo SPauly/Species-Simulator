@@ -12,11 +12,11 @@ namespace sim
     class Environment : public Map
     {
     public:
-        Environment(std::shared_ptr<sim::WinConsole>, sim::params::MapConfig &, int);
+        Environment(std::shared_ptr<WinConsole>, params::MapConfig &, int);
         virtual ~Environment();
 
         void instanciate_maps();
-        sim::Map& at_get_map(const size_t&);
+        Map& at_get_map(const size_t&);
 
     private:
         int m_map_width = 0;
@@ -24,6 +24,6 @@ namespace sim
 
         int m_map_count = DEFAULT_MAP_COUNT;
 
-        std::vector<sim::Map> m_maps;
+        std::vector<Map> m_maps;
     };
 }

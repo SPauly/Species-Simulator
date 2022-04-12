@@ -5,6 +5,10 @@
 #include <functional>
 #include <initializer_list>
 
+/*  Contains all the used parameters
+    Every Parameter should be able to be send via a Message object 
+*/
+
 namespace sim
 {
     namespace params
@@ -23,8 +27,40 @@ namespace sim
             Server_Denial,
             Server_Ping,
 
-            Send_Console_Layout, //WinConsoleLayout Type
+            Send_Map_Console_Layout, //WinConsoleLayout Type
             Send_Map_Layout //MapConfig Type 
+        };
+
+        // type used by Map instance
+        enum MapType : uint8_t
+        {
+            No_Walls,
+            Right_Wall,
+            Left_Wall,
+            Top_Wall,
+            Bottom_Wall,
+            HAS_FILL
+        };
+
+        // Type of Entity
+        enum class EntityType : uint8_t
+        {
+            ENTITY,
+            GAMEOBJECT,
+            FOOD,
+            WALL,
+            AREA,
+            DEATHZONE,
+            FARMZONE,
+            PLAYEROBJECT
+        };
+
+        // Type of Entity Style
+        enum class EntityStyle : uint8_t
+        {
+            EMPTY = 0,
+            DOT = 46,
+            HASH = 35
         };
 
         //WinConsole Layout Messsage type
@@ -51,22 +87,6 @@ namespace sim
             uint16_t WallTwo = 0;
             uint16_t WallThree = 0;
             uint16_t WallFour = 0;
-        };
-
-        struct param
-        {
-            union{
-                uint8_t small_size;
-                uint32_t mittle_size;
-                uint64_t size;
-                char symbol;
-                } type_param;
-            std::string name;
-            std::function<bool(int)> &lambda;
-        };
- 
-        class config
-        {
         };
     }
 }

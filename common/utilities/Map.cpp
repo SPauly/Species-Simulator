@@ -1,19 +1,18 @@
 #include "Map.h"
-#include <iostream>
 
 namespace sim
 {
-    Map::Map(std::shared_ptr<sim::WinConsole> console, sim::params::MapConfig &config) 
-        : Map(console,config, std::make_shared<sim::TSConsoleBuffer>(config.width, config.height))
+    Map::Map(std::shared_ptr<WinConsole> console, params::MapConfig &config) 
+        : Map(console,config, std::make_shared<TSConsoleBuffer>(config.width, config.height))
     {
     }
 
-    Map::Map(std::shared_ptr<sim::WinConsole> console, sim::params::MapConfig &config, std::shared_ptr<sim::TSConsoleBuffer> buffer)
+    Map::Map(std::shared_ptr<WinConsole> console, params::MapConfig &config, std::shared_ptr<TSConsoleBuffer> buffer)
         : m_console(console), m_config(config), m_buffer(buffer)
     {
         //set console layout
-        m_conLay._nScreenWidth = config.width;
-        m_conLay._nScreenHeight = config.height;
+        m_conLay._nScreenWidth = m_config.width;
+        m_conLay._nScreenHeight = m_config.height;
         
         //validate offset 
         if(m_config.width + m_config.x > m_console->get_layout()._nScreenWidth)
@@ -24,18 +23,18 @@ namespace sim
         //draw the walls
         switch (m_config.WallOne)
         {
-        case types::MapType::No_Walls:
+        case params::MapType::No_Walls:
             break;
-        case types::MapType::Right_Wall:
+        case params::MapType::Right_Wall:
             draw_line(m_config.width - 1, 0, m_config.width - 1, m_config.height - 1, '|');
             break;
-        case types::MapType::Left_Wall:
+        case params::MapType::Left_Wall:
             draw_line(0, 0, 0, m_config.height - 1, '|');
             break;
-        case types::MapType::Top_Wall:
+        case params::MapType::Top_Wall:
             draw_line(0, 0, m_config.width - 1, 0, '-');
             break;
-        case types::MapType::Bottom_Wall:
+        case params::MapType::Bottom_Wall:
             draw_line(0, m_config.height - 1, m_config.width - 1, m_config.height - 1, '-');
             break;
         default:
@@ -44,18 +43,18 @@ namespace sim
 
         switch (m_config.WallTwo)
         {
-        case types::MapType::No_Walls:
+        case params::MapType::No_Walls:
             break;
-        case types::MapType::Right_Wall:
+        case params::MapType::Right_Wall:
             draw_line(m_config.width - 1, 0, m_config.width - 1, m_config.height - 1, '|');
             break;
-        case types::MapType::Left_Wall:
+        case params::MapType::Left_Wall:
             draw_line(0, 0, 0, m_config.height - 1, '|');
             break;
-        case types::MapType::Top_Wall:
+        case params::MapType::Top_Wall:
             draw_line(0, 0, m_config.width - 1, 0, '-');
             break;
-        case types::MapType::Bottom_Wall:
+        case params::MapType::Bottom_Wall:
             draw_line(0, m_config.height - 1, m_config.width - 1, m_config.height - 1, '-');
             break;
         default:
@@ -64,18 +63,18 @@ namespace sim
 
         switch (m_config.WallThree)
         {
-        case types::MapType::No_Walls:
+        case params::MapType::No_Walls:
             break;
-        case types::MapType::Right_Wall:
+        case params::MapType::Right_Wall:
             draw_line(m_config.width - 1, 0, m_config.width - 1, m_config.height - 1, '|');
             break;
-        case types::MapType::Left_Wall:
+        case params::MapType::Left_Wall:
             draw_line(0, 0, 0, m_config.height - 1, '|');
             break;
-        case types::MapType::Top_Wall:
+        case params::MapType::Top_Wall:
             draw_line(0, 0, m_config.width - 1, 0, '-');
             break;
-        case types::MapType::Bottom_Wall:
+        case params::MapType::Bottom_Wall:
             draw_line(0, m_config.height - 1, m_config.width - 1, m_config.height - 1, '-');
             break;
         default:
@@ -84,18 +83,18 @@ namespace sim
 
         switch (m_config.WallFour)
         {
-        case types::MapType::No_Walls:
+        case params::MapType::No_Walls:
             break;
-        case types::MapType::Right_Wall:
+        case params::MapType::Right_Wall:
             draw_line(m_config.width - 1, 0, m_config.width - 1, m_config.height - 1, '|');
             break;
-        case types::MapType::Left_Wall:
+        case params::MapType::Left_Wall:
             draw_line(0, 0, 0, m_config.height - 1, '|');
             break;
-        case types::MapType::Top_Wall:
+        case params::MapType::Top_Wall:
             draw_line(0, 0, m_config.width - 1, 0, '-');
             break;
-        case types::MapType::Bottom_Wall:
+        case params::MapType::Bottom_Wall:
             draw_line(0, m_config.height - 1, m_config.width - 1, m_config.height - 1, '-');
             break;
         default:
@@ -143,11 +142,11 @@ namespace sim
         }
     }
 
-    sim::params::MapConfig& Map::get_config()
+    params::MapConfig& Map::get_config()
     {
         return m_config;
     }
-    sim::params::WinConsoleLayout& Map::get_layout()
+    params::WinConsoleLayout& Map::get_layout()
     {
         return m_conLay;
     }
