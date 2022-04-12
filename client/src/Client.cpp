@@ -2,12 +2,15 @@
 
 namespace sim
 {
+    Client::Client() : net::Client_Interface<params::MessageType>()
+    {
+        m_console = std::make_shared<WinConsole>(0,0,60,30,8,16);
+    }
+    Client::~Client()
+    {}
+
     void Client::run()
     {
-        m_console = std::make_shared<sim::WinConsole>(0,0,60,30,8,16);
-        sim::params::MapConfig map_config;
-        std::shared_ptr<sim::Map> map;
-
         while(1)
         {
             if(this->is_connected())
@@ -18,13 +21,14 @@ namespace sim
 
                     switch (msg.header.id)
                     {
-                    case sim::params::MessageType::Send_Console_Layout:
-                        msg >> cl;
-                        m_console->create_console(cl);
+                    case params::MessageType::Send_Map_Console_Layout:
+                        msg >> m_console_layout;
+                        m_console_layout._nScreenHeight += 5; //leave space for stats
+                        m_console->create_console(m_console_layout);
                         break;
-                    case sim::params::MessageType::Send_Map_Layout:
-                        msg >> map_config;
-                        map = std::make_shared<sim::Map>(m_console, map_config);
+                    case params::MessageType::Send_Map_Layout:
+                        msg >> m_map_config;
+                        m_map = std::make_shared<Map>(m_console, m_map_config);
                         break;
                     default:
                         break;

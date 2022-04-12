@@ -27,22 +27,22 @@ namespace sim
         virtual void on_client_validated(std::shared_ptr<net::Connection<params::MessageType>>) override;
 
     protected:
-        virtual bool on_client_connect(std::shared_ptr<sim::net::Connection<sim::params::MessageType>>) override;
-        virtual void on_client_disconnect(std::shared_ptr<sim::net::Connection<sim::params::MessageType>>) override;
-        virtual void on_message(std::shared_ptr<sim::net::Connection<sim::params::MessageType>>, sim::net::Message<sim::params::MessageType> &) override;
+        virtual bool on_client_connect(std::shared_ptr<net::Connection<params::MessageType>>) override;
+        virtual void on_client_disconnect(std::shared_ptr<net::Connection<params::MessageType>>) override;
+        virtual void on_message(std::shared_ptr<net::Connection<params::MessageType>>, net::Message<params::MessageType> &) override;
 
     private:
         //window dependencies
         int x,y;
-    	std::shared_ptr<sim::WinConsole> m_console;
+    	std::shared_ptr<WinConsole> m_console;
 
         //work thread
         std::thread m_WorkThread;
 
         //environment related
-        size_t m_nMapsCount = sim::DEFAULT_MAP_COUNT;
-        sim::params::MapConfig m_envConfig{0,0,0,0,sim::types::MapType::No_Walls};
-        std::unique_ptr<sim::Environment> m_environment;
+        size_t m_nMapsCount = DEFAULT_MAP_COUNT;
+        params::MapConfig m_envConfig{0,0,0,0,params::MapType::No_Walls};
+        std::unique_ptr<Environment> m_environment;
     };
 
 }

@@ -70,7 +70,7 @@ namespace sim
         return this->create_console();
     }
 
-    bool WinConsole::create_console(sim::params::WinConsoleLayout& cl_)
+    bool WinConsole::create_console(params::WinConsoleLayout& cl_)
     {
         _layout = std::move(cl_);
 
@@ -138,7 +138,7 @@ namespace sim
         WriteConsoleOutput(handle_, _screen.get_buffer(), {(SHORT)_screen.width, (SHORT)_screen.height}, {0, 0}, &_rectWindow);
     }
 
-    size_t WinConsole::write_buffer(HANDLE handle_, TSConsoleBuffer &buf_, sim::params::WinConsoleLayout &conLay_)
+    size_t WinConsole::write_buffer(HANDLE handle_, TSConsoleBuffer &buf_, params::WinConsoleLayout &conLay_)
     {
         if (handle_ == INVALID_HANDLE_VALUE)
             return 0;
@@ -156,7 +156,7 @@ namespace sim
         return _hConsole;
     }
 
-    sim::params::WinConsoleLayout &WinConsole::get_layout()
+    params::WinConsoleLayout &WinConsole::get_layout()
     {
         return _layout;
     }
