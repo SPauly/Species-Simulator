@@ -45,6 +45,6 @@ namespace sim
 
         sim::types::MapType m_opening;
 
-        std::vector<Entity<sim::types::EntityType, sim::types::EntityStyle>> m_vecEntities;
+        std::vector<Entity<sim::types::EntityTypes, sim::types::EntityStyle>> m_vecEntities;
     };
 }

@@ -30,12 +30,12 @@ namespace sim
         //WinConsole Layout Messsage type
         struct WinConsoleLayout
         {
-            int _nxpos = 0;
-            int _nypos = 0;
-            int _nScreenWidth = 60;
-            int _nScreenHeight = 60;
-            int _fontw = 8;
-            int _fonth = 16;
+            uint16_t _nxpos = 0;
+            uint16_t _nypos = 0;
+            uint16_t _nScreenWidth = 60;
+            uint16_t _nScreenHeight = 60;
+            uint16_t _fontw = 8;
+            uint16_t _fonth = 16;
         };
 
         //Message for sending Map Configuration
@@ -47,10 +47,10 @@ namespace sim
             uint16_t height = 0;
             
             //converted to MapType
-            uint8_t WallOne = 0;
-            uint8_t WallTwo = 0;
-            uint8_t WallThree = 0;
-            uint8_t WallFour = 0;
+            uint16_t WallOne = 0;
+            uint16_t WallTwo = 0;
+            uint16_t WallThree = 0;
+            uint16_t WallFour = 0;
         };
 
         struct param

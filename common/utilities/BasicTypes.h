@@ -18,7 +18,7 @@ namespace sim
             int get_rand(size_t, size_t);
         };
 
-        //type used by Map instance 
+        // type used by Map instance
         enum MapType : uint8_t
         {
             No_Walls,
@@ -29,16 +29,23 @@ namespace sim
             HAS_FILL
         };
 
-        //Type of Entity
-      	enum class EntityType : uint8_t
+        // Type of Entity
+        enum class EntityTypes : uint8_t
         {
-            Player,
-            Object
+            ENTITY,
+            GAMEOBJECT,
+            FOOD,
+            WALL,
+            AREA,
+            DEATHZONE,
+            FARMZONE,
+            PLAYEROBJECT
         };
 
-        //Type of Entity Style
+        // Type of Entity Style
         enum class EntityStyle : uint8_t
         {
+            EMPTY = 0;
             DOT = 46,
             HASH = 35
         };
