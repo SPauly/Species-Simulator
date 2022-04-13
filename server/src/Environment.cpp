@@ -8,6 +8,7 @@ namespace sim
         : Map(_winconsole, _config), m_map_count(_nmaps)
     {   
         m_entities.resize(m_buffer->width*m_buffer->height, nullptr);
+        create_entities();
     }
 
     Environment::~Environment()
@@ -27,7 +28,7 @@ namespace sim
                 randy = sim::rand(1, m_buffer->height -1);
             }
 
-            m_entities.at(randy * m_buffer->width * randy) = std::make_shared<Entity>(m_id_count, randx, randy, params::EntityStyle::FOOD, params::EntityType::FOOD);
+            m_entities.at(randy * m_buffer->width + randx) = std::make_shared<Entity>(m_id_count, randx, randy, params::EntityStyle::FOOD, params::EntityType::FOOD);
             ++m_id_count;
         }
     }
@@ -57,11 +58,24 @@ namespace sim
             temp_config.x = i * m_map_width;
             m_maps.push_back({m_console, temp_config, m_buffer});
         }
-    }
+
+        for(int i = 0; i < m_buffer->height; i++)
+        {
+            for(int ii = 0; ii < m_buffer->width; ii++)
+            {
+                if(check_pos(ii,i))
+                {
+                    m_buffer->write_character(ii,i,(char)check_pos(ii,i)->_char);
+                }
+            }
+        }
+
+        m_console->write_buffer(m_console->get_active_handle(), *m_buffer);
+    }   
 
     std::shared_ptr<Entity> Environment::check_pos(size_t x, size_t y)
     {
-        return m_entities.at(y * m_buffer->width * x);
+        return m_entities.at(y * m_buffer->width + x);
     }
 
     Map& Environment::at_get_map(const size_t& pos)
