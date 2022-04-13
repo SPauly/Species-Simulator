@@ -1,8 +1,10 @@
 #pragma once
+#include <vector>
 #include "NetInclude.h"
 #include "Params.h"
 #include "WinConsole.h"
 #include "Map.h"
+#include "Entity.h"
 
 namespace sim
 {
@@ -19,5 +21,8 @@ namespace sim
 
         params::MapConfig m_map_config;
         std::shared_ptr<sim::Map> m_map;
+
+        size_t m_nentities_size = 0;
+        std::vector<Entity> m_entities;
     };
 }

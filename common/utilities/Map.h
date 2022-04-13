@@ -3,10 +3,10 @@
 #include <memory>
 #include "Params.h"
 #include "WinConsole.h"
-#include "Entity.h"
 
 namespace sim
 {
+    /*Abstracts the low level stuff like the checking of boundaries and displaying Entities on screen. Needs to be inhereted from!*/
     class Map
     {
     public:
@@ -25,9 +25,6 @@ namespace sim
         std::shared_ptr<WinConsole> m_console;
     
     private:
-        
         params::WinConsoleLayout m_conLay;
-
-        std::vector<Entity> m_vecEntities;
     };
 }

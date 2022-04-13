@@ -6,6 +6,11 @@ namespace sim
     Environment::Environment(std::shared_ptr<WinConsole> _winconsole, params::MapConfig &_config, int _nmaps) 
         : Map(_winconsole, _config), m_map_count(_nmaps)
     {   
+        Entity temp{};
+        temp.id = 11111;
+        temp.x = 1;
+        temp.y = 2;
+        m_entities.resize(MAX_FOOD_PER_MAP + MAX_POPULATION_PER_MAP, temp);
     }
 
     Environment::~Environment()
@@ -42,5 +47,15 @@ namespace sim
     Map& Environment::at_get_map(const size_t& pos)
     {
         return m_maps.at(pos);
+    }
+
+    size_t Environment::get_entities_size()
+    {
+        return m_entities.size();
+    }
+
+    Entity* Environment::get_entities()
+    {
+        return m_entities.data();
     }
 }

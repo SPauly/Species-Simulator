@@ -58,6 +58,15 @@ namespace sim
         map_msg.header.id = params::MessageType::Send_Map_Layout;
         map_msg << m_environment->at_get_map(this->get_connections() - 1).get_config();
         client->send(map_msg);
+
+        //send entities
+        net::Message<params::MessageType> ent_msg;
+        ent_msg.header.id = params::MessageType::Send_Entities_Size;
+        ent_msg << m_environment->get_entities_size();
+        client->send(ent_msg);
+        ent_msg.header.id = params::MessageType::Send_Entities;
+        ent_msg.push_back_complex<Entity>(ent_msg, m_environment->get_entities(), m_environment->get_entities_size());
+        client->send(ent_msg);
     }
 
     bool Server::on_client_connect(std::shared_ptr<net::Connection<params::MessageType>> client)
