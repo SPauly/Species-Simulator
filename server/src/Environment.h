@@ -19,18 +19,23 @@ namespace sim
         Environment(std::shared_ptr<WinConsole>, params::MapConfig &, int);
         virtual ~Environment();
 
+        void create_entities();
         void instanciate_maps();
+
+        std::shared_ptr<Entity> check_pos(size_t,size_t);
+
         Map& at_get_map(const size_t&);
         size_t get_entities_size();
-        Entity* get_entities();
+        std::shared_ptr<Entity>* get_entities();
 
     private:
         int m_map_width = 0;
         int m_map_height = 0;
 
         int m_map_count = DEFAULT_MAP_COUNT;
+        uint64_t m_id_count = 0;
 
         std::vector<Map> m_maps;
-        std::vector<Entity> m_entities;
+        std::vector<std::shared_ptr<Entity>> m_entities;
     };
 }

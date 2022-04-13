@@ -1,21 +1,36 @@
 #include "Environment.h"
 #include "Params.h"
+#include "Rand.h"
 
 namespace sim
 {
     Environment::Environment(std::shared_ptr<WinConsole> _winconsole, params::MapConfig &_config, int _nmaps) 
         : Map(_winconsole, _config), m_map_count(_nmaps)
     {   
-        Entity temp{};
-        temp.id = 11111;
-        temp.x = 1;
-        temp.y = 2;
-        m_entities.resize(MAX_FOOD_PER_MAP + MAX_POPULATION_PER_MAP, temp);
+        m_entities.resize(m_buffer->width*m_buffer->height, nullptr);
     }
 
     Environment::~Environment()
     {}
 
+    void Environment::create_entities()
+    {
+        /*Add food*/
+        for(int i = 0; i < MAX_FOOD_PER_MAP * 2; i++)
+        {
+            /*generate guaranteed free x and y coordinates*/
+            int randx = sim::rand(1, m_buffer->width - 1);
+            int randy = sim::rand(1, m_buffer->height -1);
+            while(this->check_pos(randx, randy) != nullptr)
+            {
+                randx = sim::rand(1, m_buffer->width - 1);
+                randy = sim::rand(1, m_buffer->height -1);
+            }
+
+            m_entities.at(randy * m_buffer->width * randy) = std::make_shared<Entity>(m_id_count, randx, randy, params::EntityStyle::FOOD, params::EntityType::FOOD);
+            ++m_id_count;
+        }
+    }
     void Environment::instanciate_maps()
     {
         //instantiate dimensions of each map
@@ -44,6 +59,11 @@ namespace sim
         }
     }
 
+    std::shared_ptr<Entity> Environment::check_pos(size_t x, size_t y)
+    {
+        return m_entities.at(y * m_buffer->width * x);
+    }
+
     Map& Environment::at_get_map(const size_t& pos)
     {
         return m_maps.at(pos);
@@ -54,7 +74,7 @@ namespace sim
         return m_entities.size();
     }
 
-    Entity* Environment::get_entities()
+    std::shared_ptr<Entity>* Environment::get_entities()
     {
         return m_entities.data();
     }
