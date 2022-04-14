@@ -9,15 +9,16 @@ namespace sim
     struct TSConsoleBuffer
     {
         TSConsoleBuffer();
-        TSConsoleBuffer(int, int);
+        TSConsoleBuffer(size_t, size_t);
         ~TSConsoleBuffer();
         
-        void write_character(int, int, const char&);
+        void write_character(size_t, const char&);  //write character to real position
+        void write_character(size_t, size_t, const char&);    //write character to relative position of x and y
 
         CHAR_INFO *get_buffer();
 
-        int width = 0;
-        int height = 0;
+        size_t width = 0;
+        size_t height = 0;
         CHAR_INFO* char_buffer = nullptr;
     };
 
@@ -25,11 +26,11 @@ namespace sim
     {
     public:
         WinConsole() = delete;
-        WinConsole(int, int, int, int, int, int);
+        WinConsole(size_t, size_t, size_t, size_t, size_t, size_t);
         ~WinConsole();
 
         bool create_console();
-        bool create_console(int, int, int, int, int, int);
+        bool create_console(size_t, size_t, size_t, size_t, size_t, size_t);
         bool create_console(params::WinConsoleLayout&);
 
         size_t write_buffer(HANDLE, TSConsoleBuffer&); /*prefered function since the overload is untested so far */

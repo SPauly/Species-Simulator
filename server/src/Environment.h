@@ -20,13 +20,13 @@ namespace sim
         virtual ~Environment();
 
         void create_entities();
-        void instanciate_maps();
 
         std::shared_ptr<Entity> check_pos(size_t,size_t);
 
         Map& at_get_map(const size_t&);
-        size_t get_entities_size();
-        std::shared_ptr<Entity>* get_entities();
+
+    private:
+        void m_instanciate_maps();
 
     private:
         int m_map_width = 0;
@@ -36,6 +36,7 @@ namespace sim
         uint64_t m_id_count = 0;
 
         std::vector<Map> m_maps;
-        std::vector<std::shared_ptr<Entity>> m_entities;
+
+        std::vector<std::shared_ptr<std::vector<Entity>>> m_incoming_entities; // A vector of shared_ptrs to vectors of Entities -> used to hold different pointers to different vectors of incomming Entities
     };
 }

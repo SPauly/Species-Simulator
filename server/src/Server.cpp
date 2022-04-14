@@ -14,7 +14,6 @@ namespace sim
         m_envConfig.height = 50;
         //create environment with the specific coordinates
         m_environment = std::make_unique<Environment>(m_console, m_envConfig, m_nMapsCount);
-        m_environment->instanciate_maps();
     }
 
     void Server::mf_get_config()
@@ -62,7 +61,7 @@ namespace sim
         //send entities
         net::Message<params::MessageType> ent_msg;
         ent_msg.header.id = params::MessageType::Send_Entities_Size;
-        ent_msg << m_environment->get_entities_size();
+        ent_msg << m_environment->at_get_map(this->get_connections() - 1).get_entities_size();
         client->send(ent_msg);
         ent_msg.header.id = params::MessageType::Send_Entities;
         //ent_msg.push_back_complex<Entity>(ent_msg, m_environment->get_entities(), m_environment->get_entities_size());
