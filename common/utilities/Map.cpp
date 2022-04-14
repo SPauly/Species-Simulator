@@ -114,15 +114,15 @@ namespace sim
         return m_entities.at(y * m_config.width + x);
     }
 
-    void Map::update_entities(std::vector<std::shared_ptr<Entity>> &new_entities)
+    void Map::update_entities(std::shared_ptr<std::vector<Entity>> &new_entities)
     {
         //downside of this is many new memory allocations have to be made, upside less CPU usage since I don't have to search for anything
-        for(int i = 0; i < new_entities.size(); i++)
+        for(int i = 0; i < new_entities->size(); i++)
         {
             //delete the Entity at it's previous position
-            m_entities.at((new_entities.at(i)->y - new_entities.at(i)->velo_y) * m_config.width + (new_entities.at(i)->x - new_entities.at(i)->velo_x)) = nullptr;
+            m_entities.at((new_entities->at(i).y - new_entities->at(i).velo_y) * m_config.width + (new_entities->at(i).x - new_entities->at(i).velo_x)).reset();
             //write to new position
-            m_entities.at(new_entities.at(i)->y * m_config.width + new_entities.at(i)->x) = new_entities.at(i);
+            m_entities.at(new_entities->at(i).y * m_config.width + new_entities->at(i).x) = std::make_shared<Entity>(new_entities->at(i));
         }
         render();
     }

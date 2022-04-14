@@ -22,9 +22,9 @@ namespace sim
 
     void Environment::create_entities()
     {
-        int randx = 0;
-        int randy = 0;
-
+        uint16_t randx = 0;
+        uint16_t randy = 0; 
+        Entity temp_entity;
         /*Add food to each map*/
         for (int m = 0; m < m_map_count; m++)
         {
@@ -38,11 +38,15 @@ namespace sim
                     randx = sim::rand(1, m_map_width - 1);
                     randy = sim::rand(1, m_map_height - 1);
                 }
-
-                m_incoming_entities.at(m)->push_back({m_id_count, randx, randy, params::EntityStyle::FOOD, params::EntityType::FOOD});
+                temp_entity.id = m_id_count;
+                temp_entity.x = randx;
+                temp_entity.y = randy;
+                temp_entity._char = params::EntityStyle::FOOD;
+                temp_entity.type = params::EntityType::FOOD;
+                m_incoming_entities.at(m)->push_back(temp_entity);
                 ++m_id_count;
             }
-            m_maps.at(m).update_entities(*m_incoming_entities.at(m));
+            m_maps.at(m).update_entities(m_incoming_entities.at(m));
         }
     }
     void Environment::m_instanciate_maps()
