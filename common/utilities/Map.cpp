@@ -133,7 +133,7 @@ namespace sim
         {
             if(m_entities.at(i))
             {
-                m_buffer->write_character(i, (char)m_entities.at(i)->_char);
+                m_buffer->write_character((i * m_config.y + m_config.x), (char)m_entities.at(i)->_char);
             }
         }
         m_console->write_buffer(m_console->get_active_handle(), *m_buffer);
