@@ -11,12 +11,12 @@ namespace sim
     static constexpr int MAX_MAPCOUNT = 2;
     static constexpr int DEFAULT_MAP_COUNT = 2;
     static constexpr int MAX_POPULATION_PER_MAP = 100;
-    static constexpr int MAX_FOOD_PER_MAP = 200;
+    static constexpr int MAX_FOOD_PER_MAP = 500;
 
     class Environment : public Map
     {
     public:
-        Environment(std::shared_ptr<WinConsole>, params::MapConfig &, int);
+        Environment(std::shared_ptr<WinConsole>, params::MapConfig &, int, std::vector<std::vector<Entity>>&);
         virtual ~Environment();
 
         void create_entities();

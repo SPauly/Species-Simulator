@@ -4,14 +4,18 @@
 
 namespace sim
 {
-    Environment::Environment(std::shared_ptr<WinConsole> _winconsole, params::MapConfig &_config, int _nmaps)
+    Environment::Environment(std::shared_ptr<WinConsole> _winconsole, params::MapConfig &_config, int _nmaps, std::vector<std::vector<Entity>> &_incomming_vec)
         : Map(_winconsole, _config), m_map_count(_nmaps)
     {
         // instantiate dimensions of each map
         m_map_width = m_config.width / m_map_count;
         m_map_height = m_config.height;
 
-        m_incoming_entities.resize(m_map_count,std::make_shared<std::vector<Entity>>());
+        for(int i = 0; i < m_map_count; i++)
+        {
+            m_incoming_entities.push_back(std::make_shared<std::vector<Entity>>(_incomming_vec.at(i)));
+        }
+
         m_instanciate_maps();
         create_entities();
     }

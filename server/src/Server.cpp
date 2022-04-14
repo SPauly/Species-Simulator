@@ -10,10 +10,14 @@ namespace sim
         x = 240;
         y = 66;
         m_console = std::make_shared<WinConsole>(0,0,x,y,8,16);
+        
+        //initialize vectors needed for transfer of Entities
+        m_incomming_entities.resize(m_nMapsCount, std::vector<Entity>());
+
+        //create environment with the specific coordinates
         m_envConfig.width = x;
         m_envConfig.height = 50;
-        //create environment with the specific coordinates
-        m_environment = std::make_unique<Environment>(m_console, m_envConfig, m_nMapsCount);
+        m_environment = std::make_unique<Environment>(m_console, m_envConfig, m_nMapsCount, m_incomming_entities);
     }
 
     void Server::mf_get_config()
