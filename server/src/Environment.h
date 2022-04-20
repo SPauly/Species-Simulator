@@ -37,6 +37,6 @@ namespace sim
 
         std::vector<Map> m_maps;
 
-        std::vector<std::shared_ptr<std::vector<Entity>>> m_incoming_entities; // A vector of shared_ptrs to vectors of Entities -> used to hold different pointers to different vectors of incomming Entities
+        std::vector<std::vector<Entity>> *mptr_incomming_entities; // A pointer to a vector of vectors of Entities -> used to hold different pointers to different vectors of incomming Entities
     };
 }

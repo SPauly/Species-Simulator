@@ -114,8 +114,9 @@ namespace sim
         return m_entities.at(y * m_config.width + x);
     }
 
-    void Map::update_entities(std::shared_ptr<std::vector<Entity>> &new_entities)
+    void Map::update_entities(std::vector<Entity> *new_entities)
     {
+        mptr_entities_external = new_entities;
         //downside of this is many new memory allocations have to be made, upside less CPU usage since I don't have to search for anything
         for(int i = 0; i < new_entities->size(); i++)
         {
@@ -183,13 +184,13 @@ namespace sim
         return m_conLay;
     }
 
-    std::vector<std::shared_ptr<Entity>> &Map::get_entities_vec()
+    std::vector<Entity> *Map::get_entities_vec()
     {
-        return m_entities;
+        return mptr_entities_external;
     }
 
     size_t Map::get_entities_size()
     {
-        return m_entities.size();
+        return mptr_entities_external->size();
     }
 }

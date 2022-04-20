@@ -11,10 +11,7 @@ namespace sim
         m_map_width = m_config.width / m_map_count;
         m_map_height = m_config.height;
 
-        for(int i = 0; i < m_map_count; i++)
-        {
-            m_incoming_entities.push_back(std::make_shared<std::vector<Entity>>(_incomming_vec.at(i)));
-        }
+        mptr_incomming_entities = &_incomming_vec;
 
         m_instanciate_maps();
         create_entities();
@@ -27,32 +24,29 @@ namespace sim
     void Environment::create_entities()
     {
         uint16_t randx = 0;
-        uint16_t randy = 0; 
+        uint16_t randy = 0;
         Entity temp_entity;
         /*Add food to each map*/
-        for (int m = 0; m < m_map_count; m++)
+        for (int map_counter = 0; map_counter < mptr_incomming_entities->size(); map_counter++)
         {
             for (int i = 0; i < MAX_FOOD_PER_MAP; i++)
             {
-                /*generate guaranteed free x and y coordinates*/
                 randx = sim::rand(1, m_map_width - 1);
                 randy = sim::rand(1, m_map_height - 1);
-                while (m_maps.at(m).check_pos(randx, randy) != nullptr)
-                {
-                    randx = sim::rand(1, m_map_width - 1);
-                    randy = sim::rand(1, m_map_height - 1);
-                }
+
                 temp_entity.id = m_id_count;
                 temp_entity.x = randx;
                 temp_entity.y = randy;
                 temp_entity._char = params::EntityStyle::FOOD;
                 temp_entity.type = params::EntityType::FOOD;
-                m_incoming_entities.at(m)->push_back(temp_entity);
+
+                mptr_incomming_entities->at(map_counter).push_back(temp_entity);
                 ++m_id_count;
             }
-            m_maps.at(m).update_entities(m_incoming_entities.at(m));
+            m_maps.at(map_counter).update_entities(&mptr_incomming_entities->at(map_counter));
         }
     }
+
     void Environment::m_instanciate_maps()
     {
         // scale buffer to provide space for all maps
