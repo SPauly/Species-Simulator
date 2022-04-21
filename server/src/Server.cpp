@@ -7,8 +7,8 @@ namespace sim
                                                         m_nMapsCount(nmapSize_)
     {
         // set screen with to full hd with font size 8x16 pixels
-        x = 120;
-        y = 30;
+        x = 240;
+        y = 66;
         m_console = std::make_shared<WinConsole>(0, 0, x, y, 8, 16);
 
         // initialize vectors needed for transfer of Entities
@@ -16,7 +16,7 @@ namespace sim
 
         // create environment with the specific coordinates
         m_envConfig.width = x;
-        m_envConfig.height = 25;
+        m_envConfig.height = 50;
         m_environment = std::make_unique<Environment>(m_console, m_envConfig, m_nMapsCount, m_incomming_entities);
     }
 

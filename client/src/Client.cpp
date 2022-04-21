@@ -36,6 +36,7 @@ namespace sim
                         break; 
                     case params::MessageType::Send_Entities:
                         msg.pull_complex<Entity>(msg, m_entities.data(), m_entities.size());
+                        m_map->update_entities(&m_entities);
                         break;
                     default:
                         break;
