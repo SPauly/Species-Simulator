@@ -30,6 +30,14 @@ namespace sim
                         msg >> m_map_config;
                         m_map = std::make_shared<Map>(m_console, m_map_config);
                         break;
+                    case params::MessageType::Send_Entities_Size:
+                        msg >> m_nentities_size;
+                        m_entities.resize(m_nentities_size);
+                        break; 
+                    case params::MessageType::Send_Entities:
+                        msg.pull_complex<Entity>(msg, m_entities.data(), m_entities.size());
+                        m_map->update_entities(&m_entities);
+                        break;
                     default:
                         break;
                     }

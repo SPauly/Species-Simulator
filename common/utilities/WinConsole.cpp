@@ -1,16 +1,13 @@
 #include "WinConsole.h"
 namespace sim
 {
-    TSConsoleBuffer::TSConsoleBuffer(int width_, int height_) : width(width_), height(height_)
+    TSConsoleBuffer::TSConsoleBuffer(size_t width_, size_t height_) : width(width_), height(height_)
     {
         char_buffer = new CHAR_INFO[width * height];
-        for (int i = 0; i < width; i++)
+        for (int i = 0; i < width * height; i++)
         {
-            for (int ii = 0; ii < height; ii++)
-            {
-                char_buffer[ii * width + i].Char.UnicodeChar = ' ';
-                char_buffer[ii * width + i].Attributes = 0x000F;
-            }
+            char_buffer[i].Char.UnicodeChar = ' ';
+            char_buffer[i].Attributes = 0x000F;
         }
     }
 
@@ -28,7 +25,16 @@ namespace sim
         return char_buffer;
     }
 
-    void TSConsoleBuffer::write_character(int xpos_, int ypos_, const char &ch_)
+    void TSConsoleBuffer::write_character(size_t real_pos, const char &ch_)
+    {
+        if (real_pos < width * height)
+        {
+            char_buffer[real_pos].Char.UnicodeChar = ch_;
+            char_buffer[real_pos].Attributes = 0x000F;
+        }
+    }
+
+    void TSConsoleBuffer::write_character(size_t xpos_, size_t ypos_, const char &ch_)
     {
         if (xpos_ >= 0 && xpos_ < width && ypos_ >= 0 && ypos_ < height)
         {
@@ -37,7 +43,7 @@ namespace sim
         }
     }
 
-    WinConsole::WinConsole(int xpos_, int ypos_, int width_, int height_, int fontw_, int fonth_)
+    WinConsole::WinConsole(size_t xpos_, size_t ypos_, size_t width_, size_t height_, size_t fontw_, size_t fonth_)
     {
         _hConsoleOrigin = GetStdHandle(STD_OUTPUT_HANDLE);
         if (!GetConsoleScreenBufferInfo(_hConsoleOrigin, &_csbiOrigin))
@@ -46,7 +52,7 @@ namespace sim
         _hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
         if (!GetConsoleScreenBufferInfo(_hConsole, &_csbi))
             throw std::runtime_error("Could not get ConsoleScreenBufferInfo");
-        
+
         create_console(xpos_, ypos_, width_, height_, fontw_, fonth_);
     }
 
@@ -58,7 +64,7 @@ namespace sim
         SetConsoleWindowInfo(_hConsoleOrigin, TRUE, &_csbiOrigin.srWindow);
     }
 
-    bool WinConsole::create_console(int xpos_, int ypos_, int width_, int height_, int fontw_, int fonth_)
+    bool WinConsole::create_console(size_t xpos_, size_t ypos_, size_t width_, size_t height_, size_t fontw_, size_t fonth_)
     {
         _layout._nxpos = xpos_;
         _layout._nypos = ypos_;
@@ -70,7 +76,7 @@ namespace sim
         return this->create_console();
     }
 
-    bool WinConsole::create_console(params::WinConsoleLayout& cl_)
+    bool WinConsole::create_console(params::WinConsoleLayout &cl_)
     {
         _layout = std::move(cl_);
 
@@ -84,8 +90,8 @@ namespace sim
 
         if (_hConsole == INVALID_HANDLE_VALUE)
             return false;
-            
-        //get screenbuffeer info
+
+        // get screenbuffeer info
         bSuccess = GetConsoleScreenBufferInfo(_hConsole, &_csbi);
 
         // set physical window size
@@ -95,8 +101,8 @@ namespace sim
         _rectWindow.Right = (SHORT)(std::min((SHORT)_layout._nScreenWidth, coord.X) - 1);
         _rectWindow.Bottom = (SHORT)(std::min((SHORT)_layout._nScreenHeight, coord.Y) - 1);
 
-        //set window to minimal size
-        SMALL_RECT const minimal_window = {0,0,1,1};    
+        // set window to minimal size
+        SMALL_RECT const minimal_window = {0, 0, 1, 1};
         bSuccess = SetConsoleWindowInfo(_hConsole, TRUE, &minimal_window);
 
         // set console screenbuffer
@@ -119,7 +125,7 @@ namespace sim
             bSuccess = SetConsoleWindowInfo(_hConsole, TRUE, &_rectWindow);
         }
 
-        if(!SetConsoleActiveScreenBuffer(_hConsole))
+        if (!SetConsoleActiveScreenBuffer(_hConsole))
             return bSuccess = false;
 
         return bSuccess;

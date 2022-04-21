@@ -10,6 +10,8 @@ namespace sim
     Map::Map(std::shared_ptr<WinConsole> console, params::MapConfig &config, std::shared_ptr<TSConsoleBuffer> buffer)
         : m_console(console), m_config(config), m_buffer(buffer)
     {
+        m_entities.resize(m_config.width * m_config.height, nullptr);
+
         //set console layout
         m_conLay._nScreenWidth = m_config.width;
         m_conLay._nScreenHeight = m_config.height;
@@ -107,6 +109,37 @@ namespace sim
     {
     }
 
+    std::shared_ptr<Entity> Map::check_pos(size_t x, size_t y)
+    {
+        return m_entities.at(y * m_config.width + x);
+    }
+
+    void Map::update_entities(std::vector<Entity> *new_entities)
+    {
+        mptr_entities_external = new_entities;
+        //downside of this is many new memory allocations have to be made, upside less CPU usage since I don't have to search for anything
+        for(int i = 0; i < new_entities->size(); i++)
+        {
+            //delete the Entity at it's previous position
+            m_entities.at((new_entities->at(i).y - new_entities->at(i).velo_y) * m_config.width + (new_entities->at(i).x - new_entities->at(i).velo_x)).reset();
+            //write to new position
+            m_entities.at(new_entities->at(i).y * m_config.width + new_entities->at(i).x) = std::make_shared<Entity>(new_entities->at(i));
+        }
+        render();
+    }
+
+    void Map::render()
+    {
+        for(int i = 0; i < m_entities.size(); i++)
+        {
+            if(m_entities.at(i))
+            {
+                m_buffer->write_character((m_entities.at(i)->x + m_config.x), (m_entities.at(i)->y + m_config.y), (char)m_entities.at(i)->_char);
+            }
+        }
+        m_console->write_buffer(m_console->get_active_handle(), *m_buffer);
+    }
+
     void Map::draw_line(int _x, int _y, int _w, int _h, const char &_symb)
     {
         // make sure the starting point is closer to 0,0 than the destination point
@@ -149,5 +182,15 @@ namespace sim
     params::WinConsoleLayout& Map::get_layout()
     {
         return m_conLay;
+    }
+
+    std::vector<Entity> *Map::get_entities_vec()
+    {
+        return mptr_entities_external;
+    }
+
+    size_t Map::get_entities_size()
+    {
+        return mptr_entities_external->size();
     }
 }

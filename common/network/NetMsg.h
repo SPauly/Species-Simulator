@@ -89,6 +89,19 @@ namespace sim // global namespace for species simulator
                 return msg;
             }
 
+            template <typename ComplexDataType>
+            Message<T> &push_back_complex(Message<T> &msg, const ComplexDataType *data, const size_t size_of_data)
+            {
+                size_t current_body_size = msg.body.size();
+
+                msg.body.resize(current_body_size + (sizeof(ComplexDataType) * size_of_data));
+                std::memcpy(msg.body.data() + current_body_size, data, size_of_data * sizeof(ComplexDataType));
+
+                msg.header.size = msg.size();
+
+                return msg;
+            }
+
             template <typename DataType>
             friend Message<T> &operator>>(Message<T> &msg, DataType &data) // overload >> operator to get Data out of Message Type like so: msg >> data2 >> data1;
             {
@@ -101,6 +114,20 @@ namespace sim // global namespace for species simulator
                 msg.body.resize(cached_location); // resize vector
 
                 msg.header.size = msg.size(); // update size in header
+
+                return msg;
+            }
+
+            template <typename ComplexDataType>
+            Message<T> &pull_complex(Message<T> &msg, ComplexDataType *data, const size_t size_of_data)
+            {
+                size_t cached_location = msg.body.size() - sizeof(ComplexDataType) * size_of_data;
+
+                std::memcpy(data, msg.body.data() + cached_location, sizeof(ComplexDataType) * size_of_data);
+
+                msg.body.resize(cached_location);
+
+                msg.header.size = msg.size();
 
                 return msg;
             }

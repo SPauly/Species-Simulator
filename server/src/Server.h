@@ -2,10 +2,12 @@
 #include <cstdint>
 #include <thread>
 #include <memory>
+#include <vector>
 #include "NetInclude.h"
 #include "Params.h"
 #include "Environment.h"
 #include "WinConsole.h"
+#include "Entity.h"
 
 namespace sim
 {
@@ -43,6 +45,7 @@ namespace sim
         size_t m_nMapsCount = DEFAULT_MAP_COUNT;
         params::MapConfig m_envConfig{0,0,0,0,params::MapType::No_Walls};
         std::unique_ptr<Environment> m_environment;
+        std::vector<std::vector<Entity>> m_incomming_entities; 
     };
 
 }

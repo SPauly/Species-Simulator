@@ -28,7 +28,9 @@ namespace sim
             Server_Ping,
 
             Send_Map_Console_Layout, //WinConsoleLayout Type
-            Send_Map_Layout //MapConfig Type 
+            Send_Map_Layout, //MapConfig Type 
+            Send_Entities_Size,
+            Send_Entities
         };
 
         // type used by Map instance
@@ -59,8 +61,8 @@ namespace sim
         enum class EntityStyle : uint8_t
         {
             EMPTY = 0,
-            DOT = 46,
-            HASH = 35
+            FOOD = 46, //.
+            PLAYER = 35 //#
         };
 
         //WinConsole Layout Messsage type
