@@ -6,11 +6,6 @@ namespace sim
     Server::Server(uint16_t nport_, size_t nmapSize_) : net::Server_Interface<params::MessageType>(nport_),
                                                         m_nMapsCount(nmapSize_)
     {
-        // set screen with to full hd with font size 8x16 pixels
-        x = 240;
-        y = 66;
-        m_console = std::make_shared<WinConsole>(0, 0, x, y, 8, 16);
-
         // initialize vectors needed for transfer of Entities
         m_incomming_entities.resize(m_nMapsCount, std::vector<Entity>());
 
@@ -119,7 +114,7 @@ namespace sim
             }
         }
 
-        m_console->write_buffer(m_console->get_active_handle(), m_buffer);
+        m_console.write_buffer(m_console.get_active_handle(), m_buffer);
     }
 
     bool Server::mf_start_work_thread()

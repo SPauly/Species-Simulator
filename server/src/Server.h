@@ -35,8 +35,9 @@ namespace sim
 
     private:
         //window dependencies
-        int x,y;
-    	std::shared_ptr<WinConsole> m_console;
+        int x = 240;
+        int y = 66;
+    	WinConsole m_console{0,0,x,y,8,16};
 
         //work thread
         std::thread m_WorkThread;
@@ -44,7 +45,7 @@ namespace sim
         //environment related
         size_t m_nMapsCount = DEFAULT_MAP_COUNT;
         params::MapConfig m_envConfig{0,0,0,0,params::MapType::No_Walls};
-        std::unique_ptr<Environment> m_environment;
+        Environment m_environment;
         std::vector<std::vector<Entity>> m_incomming_entities; 
     };
 

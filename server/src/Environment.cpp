@@ -4,7 +4,7 @@
 
 namespace sim
 {
-    Environment::Environment(std::shared_ptr<WinConsole> _winconsole, params::MapConfig &_config, int _nmaps, std::vector<std::vector<Entity>> &_incomming_vec)
+    Environment::Environment(WinConsole &_winconsole, params::MapConfig &_config, int _nmaps, std::vector<std::vector<Entity>> &_incomming_vec)
         : Map(_winconsole, _config), m_map_count(_nmaps)
     {
         // instantiate dimensions of each map
@@ -67,7 +67,7 @@ namespace sim
 
             // set offset in Mapconfig
             temp_config.x = i * m_map_width;
-            m_maps.push_back({m_console, temp_config, m_buffer});
+            m_maps.push_back({*mptr_console, temp_config, m_buffer});
         }
     }
 

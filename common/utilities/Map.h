@@ -12,8 +12,8 @@ namespace sim
     {
     public:
         Map() = delete;
-        Map( const WinConsole &, params::MapConfig &);
-        Map( const WinConsole &, params::MapConfig &, std::shared_ptr<TSConsoleBuffer>);
+        Map(WinConsole &, params::MapConfig &);
+        Map(WinConsole &, params::MapConfig &, std::shared_ptr<TSConsoleBuffer>);
         virtual ~Map();
 
         std::shared_ptr<Entity> check_pos(size_t, size_t);
