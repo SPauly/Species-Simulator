@@ -45,7 +45,7 @@ namespace sim
         //environment related
         size_t m_nMapsCount = DEFAULT_MAP_COUNT;
         params::MapConfig m_envConfig{0,0,0,0,params::MapType::No_Walls};
-        Environment m_environment;
+        std::unique_ptr<Environment> m_environment;
         std::vector<std::vector<Entity>> m_incomming_entities; 
     };
 

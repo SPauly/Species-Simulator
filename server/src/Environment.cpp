@@ -68,6 +68,7 @@ namespace sim
             // set offset in Mapconfig
             temp_config.x = i * m_map_width;
             m_maps.push_back({*mptr_console, temp_config, m_buffer});
+            m_maps.at(i).start_map();
         }
     }
 

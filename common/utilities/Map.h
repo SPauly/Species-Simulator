@@ -15,13 +15,14 @@ namespace sim
         Map(WinConsole &, params::MapConfig &);
         Map(WinConsole &, params::MapConfig &, std::shared_ptr<TSConsoleBuffer>);
         virtual ~Map();
-
-        std::shared_ptr<Entity> check_pos(size_t, size_t);
+        
+        void start_map();
         void update_entities(std::vector<Entity>*);
         void render();
         
         void draw_line(int, int, int, int, const char&);
-        
+
+        std::shared_ptr<Entity> check_pos(size_t, size_t);
         params::MapConfig& get_config();
         params::WinConsoleLayout& get_layout();
         std::vector<Entity> *get_entities_vec();

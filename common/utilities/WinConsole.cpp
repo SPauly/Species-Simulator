@@ -43,6 +43,19 @@ namespace sim
         }
     }
 
+    WinConsole::WinConsole(params::WinConsoleLayout &layout)
+    {
+        _hConsoleOrigin = GetStdHandle(STD_OUTPUT_HANDLE);
+        if (!GetConsoleScreenBufferInfo(_hConsoleOrigin, &_csbiOrigin))
+            throw std::runtime_error("Could not get ConsoleScreenBufferInfo");
+
+        _hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+        if (!GetConsoleScreenBufferInfo(_hConsole, &_csbi))
+            throw std::runtime_error("Could not get ConsoleScreenBufferInfo");
+
+        create_console(layout);
+    }
+
     WinConsole::WinConsole(size_t xpos_, size_t ypos_, size_t width_, size_t height_, size_t fontw_, size_t fonth_)
     {
         _hConsoleOrigin = GetStdHandle(STD_OUTPUT_HANDLE);

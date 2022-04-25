@@ -21,7 +21,14 @@ namespace sim
             m_config.x = mptr_console->get_layout()._nScreenWidth - m_config.width;
         if(m_config.height + m_config.y > mptr_console->get_layout()._nScreenHeight)
             m_config.y = mptr_console->get_layout()._nScreenHeight - m_config.height;
+    }
 
+    Map::~Map()
+    {
+    }
+
+    void Map::start_map()
+    {
         //draw the walls
         switch (m_config.WallOne)
         {
@@ -105,15 +112,7 @@ namespace sim
 
         mptr_console->write_buffer(mptr_console->get_active_handle(), *m_buffer);
     }
-    Map::~Map()
-    {
-    }
-
-    std::shared_ptr<Entity> Map::check_pos(size_t x, size_t y)
-    {
-        return m_entities_internal_map.at(y * m_config.width + x);
-    }
-
+    
     void Map::update_entities(std::vector<Entity> *new_entities)
     {
         mptr_entities_external = new_entities;
@@ -138,6 +137,11 @@ namespace sim
             }
         }
         mptr_console->write_buffer(mptr_console->get_active_handle(), *m_buffer);
+    }
+
+    std::shared_ptr<Entity> Map::check_pos(size_t x, size_t y)
+    {
+        return m_entities_internal_map.at(y * m_config.width + x);
     }
 
     void Map::draw_line(int _x, int _y, int _w, int _h, const char &_symb)
