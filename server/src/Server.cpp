@@ -11,8 +11,9 @@ namespace sim
 
         // create environment with the specific coordinates
         m_envConfig.width = x;
-        m_envConfig.height = 50;
+        m_envConfig.height = 30;
         m_environment = std::make_unique<Environment>(m_console, m_envConfig, m_nMapsCount, m_incomming_entities);
+        m_environment->start_map();
     }
 
     void Server::mf_get_config()

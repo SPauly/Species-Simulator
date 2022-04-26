@@ -35,8 +35,8 @@ namespace sim
 
     private:
         //window dependencies
-        int x = 240;
-        int y = 66;
+        int x = 120;
+        int y = 44;
     	WinConsole m_console{0,0,x,y,8,16};
 
         //work thread
