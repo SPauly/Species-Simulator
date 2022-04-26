@@ -31,7 +31,7 @@ namespace sim
     protected:
         params::MapConfig m_config;
         std::shared_ptr<TSConsoleBuffer> m_buffer;
-        WinConsole *mptr_console;
+        WinConsole *mptr_console = nullptr;
     
     private:
         params::WinConsoleLayout m_conLay;
