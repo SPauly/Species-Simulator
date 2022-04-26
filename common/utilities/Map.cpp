@@ -2,26 +2,33 @@
 
 namespace sim
 {
-    Map::Map(std::shared_ptr<WinConsole> console, params::MapConfig &config) 
+    Map::Map(WinConsole &console, params::MapConfig &config) 
         : Map(console,config, std::make_shared<TSConsoleBuffer>(config.width, config.height))
     {
     }
 
-    Map::Map(std::shared_ptr<WinConsole> console, params::MapConfig &config, std::shared_ptr<TSConsoleBuffer> buffer)
-        : m_console(console), m_config(config), m_buffer(buffer)
+    Map::Map(WinConsole &console, params::MapConfig &config, std::shared_ptr<TSConsoleBuffer> buffer)
+        : mptr_console(&console), m_config(config), m_buffer(buffer)
     {
-        m_entities.resize(m_config.width * m_config.height, nullptr);
+        m_entities_internal_map.resize(m_config.width * m_config.height, nullptr);
 
         //set console layout
         m_conLay._nScreenWidth = m_config.width;
         m_conLay._nScreenHeight = m_config.height;
         
         //validate offset 
-        if(m_config.width + m_config.x > m_console->get_layout()._nScreenWidth)
-            m_config.x = m_console->get_layout()._nScreenWidth - m_config.width;
-        if(m_config.height + m_config.y > m_console->get_layout()._nScreenHeight)
-            m_config.y = m_console->get_layout()._nScreenHeight - m_config.height;
+        if(m_config.width + m_config.x > mptr_console->get_layout()._nScreenWidth)
+            m_config.x = mptr_console->get_layout()._nScreenWidth - m_config.width;
+        if(m_config.height + m_config.y > mptr_console->get_layout()._nScreenHeight)
+            m_config.y = mptr_console->get_layout()._nScreenHeight - m_config.height;
+    }
 
+    Map::~Map()
+    {
+    }
+
+    void Map::start_map()
+    {
         //draw the walls
         switch (m_config.WallOne)
         {
@@ -103,17 +110,9 @@ namespace sim
             break;
         }
 
-        m_console->write_buffer(m_console->get_active_handle(), *m_buffer);
+        mptr_console->write_buffer(mptr_console->get_active_handle(), *m_buffer);
     }
-    Map::~Map()
-    {
-    }
-
-    std::shared_ptr<Entity> Map::check_pos(size_t x, size_t y)
-    {
-        return m_entities.at(y * m_config.width + x);
-    }
-
+    
     void Map::update_entities(std::vector<Entity> *new_entities)
     {
         mptr_entities_external = new_entities;
@@ -121,23 +120,28 @@ namespace sim
         for(int i = 0; i < new_entities->size(); i++)
         {
             //delete the Entity at it's previous position
-            m_entities.at((new_entities->at(i).y - new_entities->at(i).velo_y) * m_config.width + (new_entities->at(i).x - new_entities->at(i).velo_x)).reset();
+            m_entities_internal_map.at((new_entities->at(i).y - new_entities->at(i).velo_y) * m_config.width + (new_entities->at(i).x - new_entities->at(i).velo_x)).reset();
             //write to new position
-            m_entities.at(new_entities->at(i).y * m_config.width + new_entities->at(i).x) = std::make_shared<Entity>(new_entities->at(i));
+            m_entities_internal_map.at(new_entities->at(i).y * m_config.width + new_entities->at(i).x) = std::make_shared<Entity>(new_entities->at(i));
         }
         render();
     }
 
     void Map::render()
     {
-        for(int i = 0; i < m_entities.size(); i++)
+        for(int i = 0; i < m_entities_internal_map.size(); i++)
         {
-            if(m_entities.at(i))
+            if(m_entities_internal_map.at(i))
             {
-                m_buffer->write_character((m_entities.at(i)->x + m_config.x), (m_entities.at(i)->y + m_config.y), (char)m_entities.at(i)->_char);
+                m_buffer->write_character((m_entities_internal_map.at(i)->x + m_config.x), (m_entities_internal_map.at(i)->y + m_config.y), (char)m_entities_internal_map.at(i)->_char);
             }
         }
-        m_console->write_buffer(m_console->get_active_handle(), *m_buffer);
+        mptr_console->write_buffer(mptr_console->get_active_handle(), *m_buffer);
+    }
+
+    std::shared_ptr<Entity> Map::check_pos(size_t x, size_t y)
+    {
+        return m_entities_internal_map.at(y * m_config.width + x);
     }
 
     void Map::draw_line(int _x, int _y, int _w, int _h, const char &_symb)

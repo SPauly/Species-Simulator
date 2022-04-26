@@ -35,8 +35,9 @@ namespace sim
 
     private:
         //window dependencies
-        int x,y;
-    	std::shared_ptr<WinConsole> m_console;
+        int x = 120;
+        int y = 44;
+    	WinConsole m_console{0,0,x,y,8,16};
 
         //work thread
         std::thread m_WorkThread;

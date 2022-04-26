@@ -16,7 +16,7 @@ namespace sim
     class Environment : public Map
     {
     public:
-        Environment(std::shared_ptr<WinConsole>, params::MapConfig &, int, std::vector<std::vector<Entity>>&);
+        Environment(WinConsole &, params::MapConfig &, int, std::vector<std::vector<Entity>>&);
         virtual ~Environment();
 
         void create_entities();

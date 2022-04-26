@@ -12,16 +12,17 @@ namespace sim
     {
     public:
         Map() = delete;
-        Map(std::shared_ptr<WinConsole>, params::MapConfig &);
-        Map(std::shared_ptr<WinConsole>, params::MapConfig &, std::shared_ptr<TSConsoleBuffer>);
+        Map(WinConsole &, params::MapConfig &);
+        Map(WinConsole &, params::MapConfig &, std::shared_ptr<TSConsoleBuffer>);
         virtual ~Map();
-
-        std::shared_ptr<Entity> check_pos(size_t, size_t);
+        
+        void start_map();
         void update_entities(std::vector<Entity>*);
         void render();
         
         void draw_line(int, int, int, int, const char&);
-        
+
+        std::shared_ptr<Entity> check_pos(size_t, size_t);
         params::MapConfig& get_config();
         params::WinConsoleLayout& get_layout();
         std::vector<Entity> *get_entities_vec();
@@ -30,11 +31,11 @@ namespace sim
     protected:
         params::MapConfig m_config;
         std::shared_ptr<TSConsoleBuffer> m_buffer;
-        std::shared_ptr<WinConsole> m_console;
+        WinConsole *mptr_console = nullptr;
     
     private:
         params::WinConsoleLayout m_conLay;
         std::vector<Entity> *mptr_entities_external;
-        std::vector<std::shared_ptr<Entity>> m_entities;
+        std::vector<std::shared_ptr<Entity>> m_entities_internal_map;
     };
 }

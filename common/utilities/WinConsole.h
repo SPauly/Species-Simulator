@@ -26,6 +26,7 @@ namespace sim
     {
     public:
         WinConsole() = delete;
+        WinConsole(params::WinConsoleLayout&);
         WinConsole(size_t, size_t, size_t, size_t, size_t, size_t);
         ~WinConsole();
 
