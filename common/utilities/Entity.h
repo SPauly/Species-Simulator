@@ -9,6 +9,7 @@ namespace sim
     public: 
         Entity() = default;
         Entity(uint64_t, uint16_t, uint16_t, params::EntityStyle, params::EntityType);
+        Entity(uint64_t, uint16_t, uint16_t, uint16_t, uint16_t, params::EntityStyle, params::EntityType);
         virtual ~Entity(){};
 
     public:

@@ -35,7 +35,7 @@ namespace sim
     
     private:
         params::WinConsoleLayout m_conLay;
-        std::vector<Entity> *mptr_entities_external;
+        std::vector<Entity> *mptr_entities_external = nullptr;
         std::vector<std::shared_ptr<Entity>> m_entities_internal_map;
     };
 }
