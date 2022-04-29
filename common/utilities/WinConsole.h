@@ -12,6 +12,8 @@ namespace sim
         TSConsoleBuffer(size_t, size_t);
         ~TSConsoleBuffer();
         
+        CHAR_INFO *resize(size_t);
+
         void write_character(size_t, const char&);  //write character to real position
         void write_character(size_t, size_t, const char&);    //write character to relative position of x and y
 

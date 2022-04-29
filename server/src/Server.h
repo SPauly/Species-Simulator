@@ -14,6 +14,7 @@ namespace sim
     class Server : public net::Server_Interface<params::MessageType>
     {
     public:
+        Server() = delete;
         Server(uint16_t, size_t);
 
         void run(size_t, bool); //arg: Max Number of Messages processed, bwait, number of Maps/Clients calls start_server, update Server and runs server

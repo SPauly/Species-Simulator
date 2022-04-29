@@ -18,8 +18,8 @@ namespace sim
     public:
         Environment(WinConsole &, params::MapConfig &, int, std::vector<std::vector<Entity>>&);
         virtual ~Environment();
-
-        void create_entities();
+        
+        void start() override;
 
         std::shared_ptr<Entity> check_pos(size_t,size_t);
 
@@ -27,6 +27,7 @@ namespace sim
 
     private:
         void m_instanciate_maps();
+        void m_create_entities();
 
     private:
         int m_map_width = 0;

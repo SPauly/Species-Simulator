@@ -13,7 +13,6 @@ namespace sim
         m_envConfig.width = x;
         m_envConfig.height = 30;
         m_environment = std::make_unique<Environment>(m_console, m_envConfig, m_nMapsCount, m_incomming_entities);
-        m_environment->start_map();
     }
 
     void Server::mf_get_config()
@@ -22,7 +21,8 @@ namespace sim
 
     void Server::run(size_t nMaxMesseges = -1, bool bWait = false)
     {
-
+        m_environment->start();
+        
         if (!this->start_server())
         {
             // inform of failure

@@ -1,10 +1,12 @@
 #include "WinConsole.h"
+
 namespace sim
 {
     TSConsoleBuffer::TSConsoleBuffer(size_t width_, size_t height_) : width(width_), height(height_)
     {
         char_buffer = new CHAR_INFO[width * height];
-        for (int i = 0; i < width * height; i++)
+        int i;
+        for(i = width * height; i--;)
         {
             char_buffer[i].Char.UnicodeChar = ' ';
             char_buffer[i].Attributes = 0x000F;
@@ -20,6 +22,20 @@ namespace sim
         delete[] char_buffer;
     }
 
+    CHAR_INFO *TSConsoleBuffer::resize(size_t _size)
+    {
+        if(char_buffer)
+            delete[] char_buffer;
+        
+        char_buffer = new CHAR_INFO[_size];
+        int i;
+        for(i = _size; i--;)
+        {
+            char_buffer[i].Char.UnicodeChar = ' ';
+            char_buffer[i].Attributes = 0x000F;
+        }
+    }
+
     CHAR_INFO *TSConsoleBuffer::get_buffer()
     {
         return char_buffer;
@@ -27,7 +43,7 @@ namespace sim
 
     void TSConsoleBuffer::write_character(size_t real_pos, const char &ch_)
     {
-        if (real_pos < width * height)
+        if (char_buffer && real_pos < width * height)
         {
             char_buffer[real_pos].Char.UnicodeChar = ch_;
             char_buffer[real_pos].Attributes = 0x000F;
@@ -36,7 +52,7 @@ namespace sim
 
     void TSConsoleBuffer::write_character(size_t xpos_, size_t ypos_, const char &ch_)
     {
-        if (xpos_ >= 0 && xpos_ < width && ypos_ >= 0 && ypos_ < height)
+        if (char_buffer && xpos_ >= 0 && xpos_ < width && ypos_ >= 0 && ypos_ < height)
         {
             char_buffer[ypos_ * width + xpos_].Char.UnicodeChar = ch_;
             char_buffer[ypos_ * width + xpos_].Attributes = 0x000F;
