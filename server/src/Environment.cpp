@@ -1,45 +1,82 @@
 #include "Environment.h"
-#include "BasicTypes.h"
+#include "Params.h"
+#include "Rand.h"
 
 namespace sim
 {
-    Environment::Environment(std::shared_ptr<sim::WinConsole> _winconsole, sim::params::MapConfig &_config, int _nmaps) 
+    Environment::Environment(WinConsole &_winconsole, params::MapConfig &_config, int _nmaps, std::vector<std::vector<Entity>> &_incomming_vec)
         : Map(_winconsole, _config), m_map_count(_nmaps)
-    {   
+    {
+        // instantiate dimensions of each map
+        m_map_width = m_config.width / m_map_count;
+        m_map_height = m_config.height;
+
+        mptr_incomming_entities = &_incomming_vec;
     }
 
     Environment::~Environment()
-    {}
-
-    void Environment::instanciate_maps()
     {
-        //instantiate dimensions of each map
-        m_map_width = m_config.width / m_map_count;
-        m_map_height = m_config.height;
-        
-        //scale buffer to provide space for all maps
-        m_buffer = std::make_shared<sim::TSConsoleBuffer>(m_config.width, m_config.height);
+    }
 
-        //initiate layout for the maps
-        sim::params::MapConfig temp_config{0,0, m_map_width, m_map_height};
-        temp_config.WallOne = sim::types::MapType::Bottom_Wall;
-        temp_config.WallTwo = sim::types::MapType::Top_Wall;
+    void Environment::start()
+    {
+        m_instanciate_maps();
+        m_create_entities();
+        Map::start();
+    }
 
-        //decide on weather to draw left or right wall
-        for(int i = 0; i < m_map_count; i++)
+    void Environment::m_create_entities()
+    {
+        uint16_t randx = 0;
+        uint16_t randy = 0;
+        Entity temp_entity;
+        /*Add food to each map*/
+        for (int map_counter = 0; map_counter < mptr_incomming_entities->size(); map_counter++)
         {
-            if(i % 2 > 0)
-                temp_config.WallThree = sim::types::MapType::Right_Wall;
-            else
-                temp_config.WallThree = sim::types::MapType::Left_Wall;
+            for (int i = 0; i < MAX_FOOD_PER_MAP; i++)
+            {
+                randx = sim::rand(1, m_map_width - 1);
+                randy = sim::rand(1, m_map_height - 1);
 
-            //set offset in Mapconfig
-            temp_config.x = i * m_map_width;
-            m_maps.push_back({m_console, temp_config, m_buffer});
+                temp_entity.id = m_id_count;
+                temp_entity.x = randx;
+                temp_entity.y = randy;
+                temp_entity._char = params::EntityStyle::FOOD;
+                temp_entity.type = params::EntityType::FOOD;
+
+                mptr_incomming_entities->at(map_counter).push_back(temp_entity);
+                ++m_id_count;
+            }
+            m_maps.at(map_counter).update_entities(&mptr_incomming_entities->at(map_counter));
         }
     }
 
-    sim::Map& Environment::at_get_map(const size_t& pos)
+    void Environment::m_instanciate_maps()
+    {
+        // scale buffer to provide space for all maps
+        m_buffer = std::make_shared<TSConsoleBuffer>(m_config.width, m_config.height);
+
+        // initiate layout for the maps
+        params::MapConfig temp_config{0, 0, m_map_width, m_map_height};
+        temp_config.WallOne = params::MapType::Bottom_Wall;
+        temp_config.WallTwo = params::MapType::Top_Wall;
+
+        // decide on weather to draw left or right wall
+        for (int i = 0; i < m_map_count; i++)
+        {
+            if (i % 2 > 0)
+                temp_config.WallThree = params::MapType::Right_Wall;
+            else
+                temp_config.WallThree = params::MapType::Left_Wall;
+
+            // set offset in Mapconfig
+            temp_config.x = i * m_map_width;
+            m_maps.push_back({*mptr_console, temp_config, m_buffer});
+            m_maps.at(i).start();
+        }
+    }
+
+    Map &Environment::at_get_map(const size_t &pos)
     {
         return m_maps.at(pos);
     }

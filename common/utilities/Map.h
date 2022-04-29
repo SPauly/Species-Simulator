@@ -1,50 +1,44 @@
 #pragma once
-#include <cstdint>
-#include <string>
 #include <vector>
 #include <memory>
-#include <initializer_list>
-#include "stdarg.h"
 #include "Params.h"
-#include "BasicTypes.h"
 #include "WinConsole.h"
+#include "Entity.h"
 
 namespace sim
 {
-    template <typename T, typename S>
-    struct Entity
-    {
-        uint16_t id = 0;
-        uint16_t x_pos = 0;
-        uint16_t y_pos = 0;
-
-        T type = 0;
-        S Char = 0;
-    };
-
+    /*Abstracts the low level stuff like the checking of boundaries and displaying Entities on screen. Needs to be inhereted from!*/
     class Map
     {
     public:
         Map() = delete;
-        Map(std::shared_ptr<sim::WinConsole>, sim::params::MapConfig &);
-        Map(std::shared_ptr<sim::WinConsole>, sim::params::MapConfig &, std::shared_ptr<sim::TSConsoleBuffer>);
+        Map(WinConsole &, params::MapConfig &);
+        Map(WinConsole &, params::MapConfig &, std::shared_ptr<TSConsoleBuffer>);
         virtual ~Map();
-
+        
+        virtual void start();
+        void update_entities(std::vector<Entity>*);
+        void render();
+        
         void draw_line(int, int, int, int, const char&);
-        sim::params::MapConfig& get_config();
-        sim::params::WinConsoleLayout& get_layout();
+
+        std::shared_ptr<Entity> check_pos(size_t, size_t);
+        params::MapConfig& get_config();
+        params::WinConsoleLayout& get_layout();
+        std::vector<Entity> *get_entities_vec();
+        size_t get_entities_size();
+
+    private:
+        void m_draw_walls();
 
     protected:
-        sim::params::MapConfig m_config;
-        std::shared_ptr<sim::TSConsoleBuffer> m_buffer;
-        std::shared_ptr<sim::WinConsole> m_console;
+        params::MapConfig m_config;
+        std::shared_ptr<TSConsoleBuffer> m_buffer;
+        WinConsole *mptr_console = nullptr;
     
     private:
-        
-        sim::params::WinConsoleLayout m_conLay;
-
-        sim::types::MapType m_opening;
-
-        std::vector<Entity<sim::types::EntityType, sim::types::EntityStyle>> m_vecEntities;
+        params::WinConsoleLayout m_conLay;
+        std::vector<Entity> *mptr_entities_external = nullptr;
+        std::vector<std::shared_ptr<Entity>> m_entities_internal_map;
     };
 }

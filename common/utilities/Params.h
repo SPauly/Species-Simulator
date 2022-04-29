@@ -5,6 +5,10 @@
 #include <functional>
 #include <initializer_list>
 
+/*  Contains all the used parameters
+    Every Parameter should be able to be send via a Message object 
+*/
+
 namespace sim
 {
     namespace params
@@ -23,19 +27,53 @@ namespace sim
             Server_Denial,
             Server_Ping,
 
-            Send_Console_Layout, //WinConsoleLayout Type
-            Send_Map_Layout //MapConfig Type 
+            Send_Map_Console_Layout, //WinConsoleLayout Type
+            Send_Map_Layout, //MapConfig Type 
+            Send_Entities_Size,
+            Send_Entities
+        };
+
+        // type used by Map instance
+        enum MapType : uint8_t
+        {
+            No_Walls,
+            Right_Wall,
+            Left_Wall,
+            Top_Wall,
+            Bottom_Wall,
+            HAS_FILL
+        };
+
+        // Type of Entity
+        enum class EntityType : uint8_t
+        {
+            ENTITY,
+            GAMEOBJECT,
+            FOOD,
+            WALL,
+            AREA,
+            DEATHZONE,
+            FARMZONE,
+            PLAYEROBJECT
+        };
+
+        // Type of Entity Style
+        enum class EntityStyle : uint8_t
+        {
+            EMPTY = 0,
+            FOOD = 46, //.
+            PLAYER = 35 //#
         };
 
         //WinConsole Layout Messsage type
         struct WinConsoleLayout
         {
-            int _nxpos = 0;
-            int _nypos = 0;
-            int _nScreenWidth = 60;
-            int _nScreenHeight = 60;
-            int _fontw = 8;
-            int _fonth = 16;
+            uint16_t _nxpos = 0;
+            uint16_t _nypos = 0;
+            uint16_t _nScreenWidth = 60;
+            uint16_t _nScreenHeight = 60;
+            uint16_t _fontw = 8;
+            uint16_t _fonth = 16;
         };
 
         //Message for sending Map Configuration
@@ -47,26 +85,10 @@ namespace sim
             uint16_t height = 0;
             
             //converted to MapType
-            uint8_t WallOne = 0;
-            uint8_t WallTwo = 0;
-            uint8_t WallThree = 0;
-            uint8_t WallFour = 0;
-        };
-
-        struct param
-        {
-            union{
-                uint8_t small_size;
-                uint32_t mittle_size;
-                uint64_t size;
-                char symbol;
-                } type_param;
-            std::string name;
-            std::function<bool(int)> &lambda;
-        };
- 
-        class config
-        {
+            uint16_t WallOne = 0;
+            uint16_t WallTwo = 0;
+            uint16_t WallThree = 0;
+            uint16_t WallFour = 0;
         };
     }
 }

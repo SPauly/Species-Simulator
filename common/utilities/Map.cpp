@@ -1,111 +1,66 @@
 #include "Map.h"
-#include <iostream>
 
 namespace sim
 {
-    Map::Map(std::shared_ptr<sim::WinConsole> console, sim::params::MapConfig &config) 
-        : Map(console,config, std::make_shared<sim::TSConsoleBuffer>(config.width, config.height))
+    Map::Map(WinConsole &console, params::MapConfig &config) 
+        : Map(console,config, std::make_shared<TSConsoleBuffer>(config.width, config.height))
     {
     }
 
-    Map::Map(std::shared_ptr<sim::WinConsole> console, sim::params::MapConfig &config, std::shared_ptr<sim::TSConsoleBuffer> buffer)
-        : m_console(console), m_config(config), m_buffer(buffer)
+    Map::Map(WinConsole &console, params::MapConfig &config, std::shared_ptr<TSConsoleBuffer> buffer)
+        : mptr_console(&console), m_config(config), m_buffer(buffer)
     {
+        m_entities_internal_map.resize(m_config.width * m_config.height, nullptr);
+
         //set console layout
-        m_conLay._nScreenWidth = config.width;
-        m_conLay._nScreenHeight = config.height;
+        m_conLay._nScreenWidth = m_config.width;
+        m_conLay._nScreenHeight = m_config.height;
         
         //validate offset 
-        if(m_config.width + m_config.x > m_console->get_layout()._nScreenWidth)
-            m_config.x = m_console->get_layout()._nScreenWidth - m_config.width;
-        if(m_config.height + m_config.y > m_console->get_layout()._nScreenHeight)
-            m_config.y = m_console->get_layout()._nScreenHeight - m_config.height;
-
-        //draw the walls
-        switch (m_config.WallOne)
-        {
-        case types::MapType::No_Walls:
-            break;
-        case types::MapType::Right_Wall:
-            draw_line(m_config.width - 1, 0, m_config.width - 1, m_config.height - 1, '|');
-            break;
-        case types::MapType::Left_Wall:
-            draw_line(0, 0, 0, m_config.height - 1, '|');
-            break;
-        case types::MapType::Top_Wall:
-            draw_line(0, 0, m_config.width - 1, 0, '-');
-            break;
-        case types::MapType::Bottom_Wall:
-            draw_line(0, m_config.height - 1, m_config.width - 1, m_config.height - 1, '-');
-            break;
-        default:
-            break;
-        }
-
-        switch (m_config.WallTwo)
-        {
-        case types::MapType::No_Walls:
-            break;
-        case types::MapType::Right_Wall:
-            draw_line(m_config.width - 1, 0, m_config.width - 1, m_config.height - 1, '|');
-            break;
-        case types::MapType::Left_Wall:
-            draw_line(0, 0, 0, m_config.height - 1, '|');
-            break;
-        case types::MapType::Top_Wall:
-            draw_line(0, 0, m_config.width - 1, 0, '-');
-            break;
-        case types::MapType::Bottom_Wall:
-            draw_line(0, m_config.height - 1, m_config.width - 1, m_config.height - 1, '-');
-            break;
-        default:
-            break;
-        }
-
-        switch (m_config.WallThree)
-        {
-        case types::MapType::No_Walls:
-            break;
-        case types::MapType::Right_Wall:
-            draw_line(m_config.width - 1, 0, m_config.width - 1, m_config.height - 1, '|');
-            break;
-        case types::MapType::Left_Wall:
-            draw_line(0, 0, 0, m_config.height - 1, '|');
-            break;
-        case types::MapType::Top_Wall:
-            draw_line(0, 0, m_config.width - 1, 0, '-');
-            break;
-        case types::MapType::Bottom_Wall:
-            draw_line(0, m_config.height - 1, m_config.width - 1, m_config.height - 1, '-');
-            break;
-        default:
-            break;
-        }
-
-        switch (m_config.WallFour)
-        {
-        case types::MapType::No_Walls:
-            break;
-        case types::MapType::Right_Wall:
-            draw_line(m_config.width - 1, 0, m_config.width - 1, m_config.height - 1, '|');
-            break;
-        case types::MapType::Left_Wall:
-            draw_line(0, 0, 0, m_config.height - 1, '|');
-            break;
-        case types::MapType::Top_Wall:
-            draw_line(0, 0, m_config.width - 1, 0, '-');
-            break;
-        case types::MapType::Bottom_Wall:
-            draw_line(0, m_config.height - 1, m_config.width - 1, m_config.height - 1, '-');
-            break;
-        default:
-            break;
-        }
-
-        m_console->write_buffer(m_console->get_active_handle(), *m_buffer);
+        if(m_config.width + m_config.x > mptr_console->get_layout()._nScreenWidth)
+            m_config.x = mptr_console->get_layout()._nScreenWidth - m_config.width;
+        if(m_config.height + m_config.y > mptr_console->get_layout()._nScreenHeight)
+            m_config.y = mptr_console->get_layout()._nScreenHeight - m_config.height;
     }
+
     Map::~Map()
     {
+    }
+
+    void Map::start()
+    {
+        m_draw_walls();
+    }
+    
+    void Map::update_entities(std::vector<Entity> *new_entities)
+    {
+        mptr_entities_external = new_entities;
+        //downside of this is many new memory allocations have to be made, upside less CPU usage since I don't have to search for anything
+        for(int i = 0; i < new_entities->size(); i++)
+        {
+            //delete the Entity at it's previous position
+            m_entities_internal_map.at((new_entities->at(i).y - new_entities->at(i).velo_y) * m_config.width + (new_entities->at(i).x - new_entities->at(i).velo_x)).reset();
+            //write to new position
+            m_entities_internal_map.at(new_entities->at(i).y * m_config.width + new_entities->at(i).x) = std::make_shared<Entity>(new_entities->at(i));
+        }
+        render();
+    }
+
+    void Map::render()
+    {
+        for(int i = 0; i < m_entities_internal_map.size(); i++)
+        {
+            if(m_entities_internal_map.at(i))
+            {
+                m_buffer->write_character((m_entities_internal_map.at(i)->x + m_config.x), (m_entities_internal_map.at(i)->y + m_config.y), (char)m_entities_internal_map.at(i)->_char);
+            }
+        }
+        mptr_console->write_buffer(mptr_console->get_active_handle(), *m_buffer);
+    }
+
+    std::shared_ptr<Entity> Map::check_pos(size_t x, size_t y)
+    {
+        return m_entities_internal_map.at(y * m_config.width + x);
     }
 
     void Map::draw_line(int _x, int _y, int _w, int _h, const char &_symb)
@@ -143,12 +98,108 @@ namespace sim
         }
     }
 
-    sim::params::MapConfig& Map::get_config()
+    void Map::m_draw_walls()
+    {
+        //draw the walls
+        switch (m_config.WallOne)
+        {
+        case params::MapType::No_Walls:
+            break;
+        case params::MapType::Right_Wall:
+            draw_line(m_config.width - 1, 0, m_config.width - 1, m_config.height - 1, '|');
+            break;
+        case params::MapType::Left_Wall:
+            draw_line(0, 0, 0, m_config.height - 1, '|');
+            break;
+        case params::MapType::Top_Wall:
+            draw_line(0, 0, m_config.width - 1, 0, '-');
+            break;
+        case params::MapType::Bottom_Wall:
+            draw_line(0, m_config.height - 1, m_config.width - 1, m_config.height - 1, '-');
+            break;
+        default:
+            break;
+        }
+
+        switch (m_config.WallTwo)
+        {
+        case params::MapType::No_Walls:
+            break;
+        case params::MapType::Right_Wall:
+            draw_line(m_config.width - 1, 0, m_config.width - 1, m_config.height - 1, '|');
+            break;
+        case params::MapType::Left_Wall:
+            draw_line(0, 0, 0, m_config.height - 1, '|');
+            break;
+        case params::MapType::Top_Wall:
+            draw_line(0, 0, m_config.width - 1, 0, '-');
+            break;
+        case params::MapType::Bottom_Wall:
+            draw_line(0, m_config.height - 1, m_config.width - 1, m_config.height - 1, '-');
+            break;
+        default:
+            break;
+        }
+
+        switch (m_config.WallThree)
+        {
+        case params::MapType::No_Walls:
+            break;
+        case params::MapType::Right_Wall:
+            draw_line(m_config.width - 1, 0, m_config.width - 1, m_config.height - 1, '|');
+            break;
+        case params::MapType::Left_Wall:
+            draw_line(0, 0, 0, m_config.height - 1, '|');
+            break;
+        case params::MapType::Top_Wall:
+            draw_line(0, 0, m_config.width - 1, 0, '-');
+            break;
+        case params::MapType::Bottom_Wall:
+            draw_line(0, m_config.height - 1, m_config.width - 1, m_config.height - 1, '-');
+            break;
+        default:
+            break;
+        }
+
+        switch (m_config.WallFour)
+        {
+        case params::MapType::No_Walls:
+            break;
+        case params::MapType::Right_Wall:
+            draw_line(m_config.width - 1, 0, m_config.width - 1, m_config.height - 1, '|');
+            break;
+        case params::MapType::Left_Wall:
+            draw_line(0, 0, 0, m_config.height - 1, '|');
+            break;
+        case params::MapType::Top_Wall:
+            draw_line(0, 0, m_config.width - 1, 0, '-');
+            break;
+        case params::MapType::Bottom_Wall:
+            draw_line(0, m_config.height - 1, m_config.width - 1, m_config.height - 1, '-');
+            break;
+        default:
+            break;
+        }
+
+        mptr_console->write_buffer(mptr_console->get_active_handle(), *m_buffer);
+    }
+
+    params::MapConfig& Map::get_config()
     {
         return m_config;
     }
-    sim::params::WinConsoleLayout& Map::get_layout()
+    params::WinConsoleLayout& Map::get_layout()
     {
         return m_conLay;
+    }
+
+    std::vector<Entity> *Map::get_entities_vec()
+    {
+        return mptr_entities_external;
+    }
+
+    size_t Map::get_entities_size()
+    {
+        return mptr_entities_external->size();
     }
 }
