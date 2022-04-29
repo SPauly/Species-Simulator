@@ -16,7 +16,7 @@ namespace sim
         Map(WinConsole &, params::MapConfig &, std::shared_ptr<TSConsoleBuffer>);
         virtual ~Map();
         
-        void start_map();
+        virtual void start();
         void update_entities(std::vector<Entity>*);
         void render();
         
@@ -27,6 +27,9 @@ namespace sim
         params::WinConsoleLayout& get_layout();
         std::vector<Entity> *get_entities_vec();
         size_t get_entities_size();
+
+    private:
+        void m_draw_walls();
 
     protected:
         params::MapConfig m_config;

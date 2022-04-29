@@ -1,12 +1,16 @@
 #include "WinConsole.h"
-#include <cstring>
 
 namespace sim
 {
     TSConsoleBuffer::TSConsoleBuffer(size_t width_, size_t height_) : width(width_), height(height_)
     {
         char_buffer = new CHAR_INFO[width * height];
-        std::memset(char_buffer, 0, width * height);
+        int i;
+        for(i = width * height; i--;)
+        {
+            char_buffer[i].Char.UnicodeChar = ' ';
+            char_buffer[i].Attributes = 0x000F;
+        }
     }
 
     TSConsoleBuffer::TSConsoleBuffer() : TSConsoleBuffer::TSConsoleBuffer(1, 1)
@@ -22,8 +26,14 @@ namespace sim
     {
         if(char_buffer)
             delete[] char_buffer;
+        
         char_buffer = new CHAR_INFO[_size];
-        std::memset(char_buffer, 0, _size);
+        int i;
+        for(i = _size; i--;)
+        {
+            char_buffer[i].Char.UnicodeChar = ' ';
+            char_buffer[i].Attributes = 0x000F;
+        }
     }
 
     CHAR_INFO *TSConsoleBuffer::get_buffer()

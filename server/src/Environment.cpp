@@ -12,16 +12,20 @@ namespace sim
         m_map_height = m_config.height;
 
         mptr_incomming_entities = &_incomming_vec;
-
-        m_instanciate_maps();
-        create_entities();
     }
 
     Environment::~Environment()
     {
     }
 
-    void Environment::create_entities()
+    void Environment::start()
+    {
+        m_instanciate_maps();
+        m_create_entities();
+        Map::start();
+    }
+
+    void Environment::m_create_entities()
     {
         uint16_t randx = 0;
         uint16_t randy = 0;
@@ -68,7 +72,7 @@ namespace sim
             // set offset in Mapconfig
             temp_config.x = i * m_map_width;
             m_maps.push_back({*mptr_console, temp_config, m_buffer});
-            m_maps.at(i).start_map();
+            m_maps.at(i).start();
         }
     }
 
