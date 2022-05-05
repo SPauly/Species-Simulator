@@ -6,6 +6,8 @@
 #include "WinConsole.h"
 #include "Map.h"
 #include "Entity.h"
+#include "TSVector.h"
+#include "ClientMap.h"
 
 namespace sim
 {

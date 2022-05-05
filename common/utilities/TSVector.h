@@ -14,45 +14,41 @@ namespace sim
         std::condition_variable *cv_ptr = nullptr;
 
     public:
-        TSVector() = default;
         TSVector(std::condition_variable &cv = nullptr)
             : cv_ptr(cv)
         {
-            if(!cv_ptr)
+            if (!cv_ptr)
                 cv_ptr = new std::condition_variable;
         }
-        TSVector(const TSVector<T> &new_vec)
-        {
-            std::copy(new_vec.begin(), new_vec.end(), std::back_inserter(vec));
-        } // delete copy constructor so no reading when copying
+        TSVector(const TSVector<T> &) = delete;
+
         virtual ~TSVector()
         {
-            if(cv_ptr)
+            if (cv_ptr)
                 delete cv_ptr;
             clear();
         }
 
     public:
-        //copy operator -> copy one element of vector thread save into another one
-        T& operator=(const T& other)
+        TSVector<T> &operator=(const std::vector<T> &new_vec)
         {
             std::scoped_lock lock(muxQueue);
-            //avoid self assignment
-            if(this == &other)
-                return *this;
 
-            *this = std::move(other); //more testing needed
+            if (this->vec == &new_vec)
+                return this;
+
+            std::copy(new_vec.begin(), new_vec.end(), std::back_inserter(vec));
             cv_ptr->notify_one();
-            return this*;
+            return this;
         }
 
-        T& at(size_t pos)
+        T &at(size_t pos)
         {
             std::scoped_lock lock(muxQueue);
             return vec.at(pos);
         }
 
-        std::vector<T> *const raw() // warning! this function is not enables non threadsave access to vector
+        std::vector<T> *const raw() // warning! this function enables non threadsave access to vector
         {
             return &vec;
         }
@@ -89,7 +85,7 @@ namespace sim
             return vec.empty();
         }
 
-        size_t count()
+        size_t size()
         {
             std::scoped_lock lock(muxQueue);
             return vec.size();
@@ -104,15 +100,22 @@ namespace sim
         T pop_back()
         {
             std::scoped_lock lock(muxQueue);
-            auto t = std::move vec.back();
+            auto t = std::move(vec.back());
             vec.pop_back();
             return t;
         }
 
-        void resize()
+        void resize(size_t size)
         {
             std::scoped_lock lock(muxQueue);
-            vec.resize();
+            vec.resize(size);
+            return;
+        }
+
+        void resize(size_t size, const T &initial)
+        {
+            std::scoped_lock lock(muxQueue);
+            vec.resize(size, initial);
             return;
         }
 
