@@ -19,7 +19,6 @@ namespace sim
     private:
         params::WinConsoleLayout m_console_layout;
         WinConsole m_console{m_console_layout};
-        
         params::MapConfig m_map_config;
         std::unique_ptr<sim::Map> m_map;
 
