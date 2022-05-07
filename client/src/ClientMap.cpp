@@ -14,11 +14,5 @@ namespace sim
 
     void ClientMap::run()
     {
-        //small tsvec test
-        std::condition_variable cv;
-        TSVector<Entity> tsvec;
-        tsvec.resize(10000);
-        auto t = tsvec.at(2000);
-        tsvec.clear();
     }
 }

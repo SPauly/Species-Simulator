@@ -4,6 +4,7 @@
 #include "Params.h"
 #include "WinConsole.h"
 #include "Entity.h"
+#include "TSVector.h"
 
 namespace sim
 {
@@ -17,7 +18,7 @@ namespace sim
         virtual ~Map();
         
         virtual void start();
-        void update_entities(std::vector<Entity>*);
+        void update_entities(TSVector<Entity>*);
         void render();
         
         void draw_line(int, int, int, int, const char&);
@@ -25,7 +26,7 @@ namespace sim
         std::shared_ptr<Entity> check_pos(size_t, size_t);
         params::MapConfig& get_config();
         params::WinConsoleLayout& get_layout();
-        std::vector<Entity> *get_entities_vec();
+        TSVector<Entity> *get_entities_vec();
         size_t get_entities_size();
 
     private:
@@ -38,7 +39,7 @@ namespace sim
     
     private:
         params::WinConsoleLayout m_conLay;
-        std::vector<Entity> *mptr_entities_external = nullptr;
+        TSVector<Entity> *mptr_entities_external = nullptr;
         std::vector<std::shared_ptr<Entity>> m_entities_internal_map;
     };
 }

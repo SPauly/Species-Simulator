@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include <vector>
 #include <thread>
 #include <mutex>
@@ -12,25 +13,25 @@ namespace sim
     protected:
         std::mutex muxVec;
         std::vector<T> vec;
-        std::condition_variable *cv_ptr = nullptr;
+        std::shared_ptr<std::condition_variable> cv_ptr = nullptr;
 
     public:
         TSVector()
         {
-            cv_ptr = new std::condition_variable;
+            cv_ptr = std::make_shared<std::condition_variable>();
         }
-        TSVector(std::condition_variable &cv)
+        TSVector(std::shared_ptr<std::condition_variable> cv)
             : cv_ptr(cv)
         {
             if (!cv_ptr)
-                cv_ptr = new std::condition_variable;
+                cv_ptr = std::make_shared<std::condition_variable>();
         }
         TSVector(const TSVector<T> &) = delete;
 
         virtual ~TSVector()
         {
             if (cv_ptr)
-                delete cv_ptr;
+                cv_ptr.reset();
             clear();
         }
 

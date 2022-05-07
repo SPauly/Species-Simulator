@@ -32,7 +32,7 @@ namespace sim
         m_draw_walls();
     }
     
-    void Map::update_entities(std::vector<Entity> *new_entities)
+    void Map::update_entities(TSVector<Entity> *new_entities)
     {
         mptr_entities_external = new_entities;
         //downside of this is many new memory allocations have to be made, upside less CPU usage since I don't have to search for anything
@@ -193,7 +193,7 @@ namespace sim
         return m_conLay;
     }
 
-    std::vector<Entity> *Map::get_entities_vec()
+    TSVector<Entity> *Map::get_entities_vec()
     {
         return mptr_entities_external;
     }
