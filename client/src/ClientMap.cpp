@@ -1,5 +1,5 @@
 #include "ClientMap.h"
-#include <utilities>
+#include <condition_variable>
 
 namespace sim
 {
@@ -16,9 +16,9 @@ namespace sim
     {
         //small tsvec test
         std::condition_variable cv;
-        TSVector<Entity> tsvec(cv);
+        TSVector<Entity> tsvec;
         tsvec.resize(10000);
-        tsvec.at(2000) = (Entity){0,0};
+        auto t = tsvec.at(2000);
         tsvec.clear();
     }
 }
