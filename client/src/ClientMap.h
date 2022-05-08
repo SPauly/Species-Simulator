@@ -7,7 +7,7 @@ namespace sim
     class ClientMap : public Map
     {
     public:
-        ClientMap(WinConsole &, params::MapConfig &);
+        ClientMap(WinConsole &, params::MapConfig &, TSVector<Entity> *);
         virtual ~ClientMap();
     
         virtual void run() override;

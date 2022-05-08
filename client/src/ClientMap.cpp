@@ -3,8 +3,8 @@
 
 namespace sim
 {
-    ClientMap::ClientMap(WinConsole &_console, params::MapConfig &_mapcon)
-        : Map(_console, _mapcon)
+    ClientMap::ClientMap(WinConsole &_console, params::MapConfig &_mapcon, TSVector<Entity> *vecptr)
+        : Map(_console, _mapcon, vecptr)
     {
     }
 

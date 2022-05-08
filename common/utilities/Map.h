@@ -13,8 +13,8 @@ namespace sim
     {
     public:
         Map() = delete;
-        Map(WinConsole &, params::MapConfig &);
-        Map(WinConsole &, params::MapConfig &, std::shared_ptr<TSConsoleBuffer>);
+        Map(WinConsole &, params::MapConfig &, TSVector<Entity> *);
+        Map(WinConsole &, params::MapConfig &, TSVector<Entity> *, std::shared_ptr<TSConsoleBuffer>);
         virtual ~Map();
         
         virtual void run();

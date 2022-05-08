@@ -63,7 +63,7 @@ namespace sim
                         break;
                     case params::MessageType::Send_Map_Layout:
                         msg >> m_map_config;
-                        m_map = std::make_unique<ClientMap>(m_console, m_map_config);
+                        m_map = std::make_unique<ClientMap>(m_console, m_map_config, &m_entities);
                         GOT_MAP = true;
                         break;
                     case params::MessageType::Send_Entities_Size:

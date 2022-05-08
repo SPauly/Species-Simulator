@@ -2,13 +2,13 @@
 
 namespace sim
 {
-    Map::Map(WinConsole &console, params::MapConfig &config) 
-        : Map(console,config, std::make_shared<TSConsoleBuffer>(config.width, config.height))
+    Map::Map(WinConsole &console, params::MapConfig &config, TSVector<Entity> *vecptr) 
+        : Map(console,config, vecptr, std::make_shared<TSConsoleBuffer>(config.width, config.height))
     {
     }
 
-    Map::Map(WinConsole &console, params::MapConfig &config, std::shared_ptr<TSConsoleBuffer> buffer)
-        : mptr_console(&console), m_config(config), m_buffer(buffer)
+    Map::Map(WinConsole &console, params::MapConfig &config, TSVector<Entity> *vecptr, std::shared_ptr<TSConsoleBuffer> buffer)
+        : mptr_console(&console), m_config(config), mptr_entities_external(vecptr), m_buffer(buffer)
     {
         m_entities_internal_map.resize(m_config.width * m_config.height, nullptr);
 
@@ -28,13 +28,20 @@ namespace sim
     }
 
     void Map::run()
-    {
+    {  
+        //start up 
         m_draw_walls();
+
+        //main loop
+        //wait for x number of updates in m_entities_external
+        //update entities accourdingly
+        //send entities to connection
     }
     
-    void Map::update_entities(TSVector<Entity> *new_entities)
+    void Map::update_entities(TSVector<Entity> *new_entities = nullptr)
     {
-        mptr_entities_external = new_entities;
+        if(!new_entities)
+            new_entities = mptr_entities_external;
         //downside of this is many new memory allocations have to be made, upside less CPU usage since I don't have to search for anything
         for(int i = 0; i < new_entities->size(); i++)
         {
