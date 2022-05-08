@@ -38,6 +38,6 @@ namespace sim
 
         std::vector<Map> m_maps;
 
-        std::vector<std::vector<Entity>> *mptr_incomming_entities; // A pointer to a vector of vectors of Entities -> used to hold different pointers to different vectors of incomming Entities
+        TSVector<TSVector<Entity>> *mptr_incomming_entities; // A pointer to a vector of vectors of Entities -> used to hold different pointers to different vectors of incomming Entities
     };
 }

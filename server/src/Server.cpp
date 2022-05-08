@@ -7,7 +7,7 @@ namespace sim
                                                         m_nMapsCount(nmapSize_)
     {
         // initialize vectors needed for transfer of Entities
-        m_incomming_entities.resize(m_nMapsCount, std::vector<Entity>());
+        m_incomming_entities.resize(m_nMapsCount, TSVector<Entity>());
 
         // create environment with the specific coordinates
         m_envConfig.width = x;
