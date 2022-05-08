@@ -10,7 +10,7 @@ namespace sim
         ClientMap(WinConsole &, params::MapConfig &);
         virtual ~ClientMap();
     
-        void run();
+        virtual void run() override;
     
     private:
 

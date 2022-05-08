@@ -14,5 +14,12 @@ namespace sim
 
     void ClientMap::run()
     {
+        Map::run();
+
+        //get incomming Entities
+        //update screen
+        //send map to server
+        //check for connected entities
+        //read new Entity positions
     }
 }

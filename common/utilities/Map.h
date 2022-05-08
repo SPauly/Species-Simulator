@@ -17,7 +17,7 @@ namespace sim
         Map(WinConsole &, params::MapConfig &, std::shared_ptr<TSConsoleBuffer>);
         virtual ~Map();
         
-        virtual void start();
+        virtual void run();
         void update_entities(TSVector<Entity>*);
         void render();
         

@@ -110,7 +110,6 @@ namespace sim
                     return false;
             }
 
-        public:
             void send(const Message<T>& msg)
             {
                 if(is_connected())
@@ -123,6 +122,23 @@ namespace sim
             {
                 return m_qMessagesIn;
             }
+
+            void update(size_t nMaxMessages = -1, bool bwait = false) // forwards all incomming messages via abstracted on_message function
+            {
+                if(bwait)
+                    m_qMessagesIn.wait();
+                size_t nMessageCount = 0;
+                while (nMessageCount < nMaxMessages && !m_qMessagesIn.empty())
+                {
+                    auto msg = m_qMessagesIn.pop_front();
+                    on_message(msg.msg);
+                    nMessageCount++;
+                }
+            }
+        
+        protected:
+            virtual void on_message(Message<T> &msg)
+            {};
 
         protected:
             asio::io_context m_AsioContext;

@@ -20,6 +20,9 @@ namespace sim
         
         void run();
     
+    protected:
+        virtual void on_message(net::Message<params::MessageType> &msg) override;
+    
     private:
         bool m_start();
 
@@ -36,8 +39,9 @@ namespace sim
         WinConsole m_console{m_console_layout};
 
         //Map
+        std::thread m_mapThread; 
         params::MapConfig m_map_config;
-        std::unique_ptr<sim::Map> m_map;
+        std::unique_ptr<sim::ClientMap> m_map;
 
         //shared resources
         size_t m_nentities_size = 0;
