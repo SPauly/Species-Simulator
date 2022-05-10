@@ -48,9 +48,11 @@ namespace sim
             return this;
         }
 
-        T &at(size_t pos)
+        T &at(size_t pos, bool READ_FLAG = false)
         {
             std::scoped_lock lock(muxVec);
+            if(READ_FLAG)
+                cv_ptr->notify_one();
             return vec.at(pos);
         }
 
@@ -125,14 +127,27 @@ namespace sim
             return;
         }
 
-        void wait()
+        void wait(std::shared_ptr<std::condition_variable> custom_ptr = cv_ptr)
         {
             std::unique_lock<std::mutex> wait_lock(muxVec);
 
-            while (vec.empty())
+            //change cv_ptr to custom ptr if necessary
+            bool CHANGED_CVPTR = false;
+            std::shared_ptr<std::condition_variable> prev_ptr = cv_ptr;
+
+            if(custom_ptr != cv_ptr)
             {
-                cv_ptr->wait(wait_lock);
+                cv_ptr = custom_ptr;
+                CHANGED_CVPTR = true;
             }
+
+            //actual wait -> may want to add a loop with appropriate condition here
+            cv_ptr->wait(wait_lock);
+
+            //change ptr back if it was changed
+            if(CHANGED_CVPTR)
+                cv_ptr = prev_ptr;
         }
+
     };
 }

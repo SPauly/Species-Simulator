@@ -27,13 +27,21 @@ namespace sim
     {
     }
 
-    void Map::run()
+    void Map::run(size_t update_freq = 0) //set freq. to 
     {  
         //start up 
         m_draw_walls();
 
         //main loop
         //wait for x number of updates in m_entities_external
+        size_t wakeup_calls = 0;
+        std::condition_variable custom_cond;
+
+        while(wakeup_calls <= update_freq)
+        {
+            mptr_entities_external->wait(std::make_shared<std::condition_variable>(custom_cond));
+            ++wakeup_calls;
+        }
         //update entities accourdingly
         //send entities to connection
     }

@@ -12,7 +12,7 @@ namespace sim
     {
     }
 
-    void ClientMap::run()
+    void ClientMap::run(size_t update_freq = -1)
     {
         Map::run();
 
