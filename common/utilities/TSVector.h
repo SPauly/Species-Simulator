@@ -127,7 +127,7 @@ namespace sim
             return;
         }
 
-        void wait(std::shared_ptr<std::condition_variable> custom_ptr = cv_ptr)
+        void wait(std::shared_ptr<std::condition_variable> custom_ptr = nullptr)
         {
             std::unique_lock<std::mutex> wait_lock(muxVec);
 
@@ -135,7 +135,7 @@ namespace sim
             bool CHANGED_CVPTR = false;
             std::shared_ptr<std::condition_variable> prev_ptr = cv_ptr;
 
-            if(custom_ptr != cv_ptr)
+            if(custom_ptr)
             {
                 cv_ptr = custom_ptr;
                 CHANGED_CVPTR = true;

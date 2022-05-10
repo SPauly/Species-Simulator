@@ -27,26 +27,29 @@ namespace sim
     {
     }
 
-    void Map::run(size_t update_freq = 0) //set freq. to 
+    void Map::run(size_t update_freq) //set freq. to 
     {  
         //start up 
         m_draw_walls();
 
         //main loop
         //wait for x number of updates in m_entities_external
+        if(update_freq > mptr_entities_external->size())
+            update_freq = mptr_entities_external->size();
         size_t wakeup_calls = 0;
-        std::condition_variable custom_cond;
+        std::shared_ptr<std::condition_variable> custom_cond = std::make_shared<std::condition_variable>();
 
         while(wakeup_calls <= update_freq)
         {
-            mptr_entities_external->wait(std::make_shared<std::condition_variable>(custom_cond));
+            mptr_entities_external->wait(custom_cond);
             ++wakeup_calls;
         }
         //update entities accourdingly
-        //send entities to connection
+        update_entities();
+        //check for necessary connections that might have to be established
     }
     
-    void Map::update_entities(TSVector<Entity> *new_entities = nullptr)
+    void Map::update_entities(TSVector<Entity> *new_entities)
     {
         if(!new_entities)
             new_entities = mptr_entities_external;
@@ -58,10 +61,10 @@ namespace sim
             //write to new position
             m_entities_internal_map.at(new_entities->at(i).y * m_config.width + new_entities->at(i).x) = std::make_shared<Entity>(new_entities->at(i));
         }
-        render();
+        render(true);
     }
 
-    void Map::render()
+    void Map::render(bool WRITE_TO_BUFFER_ONLY = false)
     {
         for(int i = 0; i < m_entities_internal_map.size(); i++)
         {
@@ -70,7 +73,8 @@ namespace sim
                 m_buffer->write_character((m_entities_internal_map.at(i)->x + m_config.x), (m_entities_internal_map.at(i)->y + m_config.y), (char)m_entities_internal_map.at(i)->_char);
             }
         }
-        mptr_console->write_buffer(mptr_console->get_active_handle(), *m_buffer);
+        if(!WRITE_TO_BUFFER_ONLY)
+            mptr_console->write_buffer(mptr_console->get_active_handle(), *m_buffer);
     }
 
     std::shared_ptr<Entity> Map::check_pos(size_t x, size_t y)

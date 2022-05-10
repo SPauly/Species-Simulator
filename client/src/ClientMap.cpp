@@ -12,12 +12,12 @@ namespace sim
     {
     }
 
-    void ClientMap::run(size_t update_freq = -1)
+    void ClientMap::run(size_t update_freq)
     {
-        Map::run();
-
-        //get incomming Entities
+        //fetch incomming Entities
+        Map::run(update_freq);
         //update screen
+        mptr_console->write_buffer(mptr_console->get_active_handle(), *m_buffer);
         //send map to server
         //check for connected entities
         //read new Entity positions
