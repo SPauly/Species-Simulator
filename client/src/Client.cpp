@@ -25,11 +25,14 @@ namespace sim
         m_mapThread = std::thread([this]()
                                   { if(m_map) 
                                         m_map->run(); });
+        m_entities.at(2, false) = {100,100,100,0,0,params::EntityStyle::PLAYER,params::EntityType::PLAYEROBJECT}; 
+        
 
         // prime main thread with message distribution work
         while (true)
         {
-            update(-1, true); // runs the asio loop -> processes incomming messages
+            m_entities.at(2, false) = {100,100,100,0,0,params::EntityStyle::PLAYER,params::EntityType::PLAYEROBJECT}; 
+            //update(-1, true); // runs the asio loop -> processes incomming messages
         }
     }
 

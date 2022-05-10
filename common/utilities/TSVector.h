@@ -26,7 +26,12 @@ namespace sim
             if (!cv_ptr)
                 cv_ptr = std::make_shared<std::condition_variable>();
         }
-        TSVector(const TSVector<T> &) = delete;
+        TSVector(const TSVector<T> &new_vec)
+        {
+            std::scoped_lock lock(muxVec);
+            vec = new_vec.vec;
+            cv_ptr = new_vec.cv_ptr;
+        };
 
         virtual ~TSVector()
         {
@@ -36,6 +41,26 @@ namespace sim
         }
 
     public:
+        TSVector<T> &operator=(const TSVector<T> &&new_vec)
+        {
+            std::scoped_lock lock(muxVec);
+
+            vec = new_vec.vec;
+            cv_ptr = new_vec.cv_ptr;
+
+            return *this;
+        }
+
+        TSVector<T> &operator=(const TSVector<T> &new_vec)
+        {
+            std::scoped_lock lock(muxVec);
+
+            vec = new_vec.vec;
+            cv_ptr = new_vec.cv_ptr;
+
+            return *this;
+        }
+        
         TSVector<T> &operator=(const std::vector<T> &new_vec)
         {
             std::scoped_lock lock(muxVec);
@@ -48,10 +73,10 @@ namespace sim
             return this;
         }
 
-        T &at(size_t pos, bool READ_FLAG = false)
+        const T &at(size_t pos, bool READ_ONLY = true)
         {
             std::scoped_lock lock(muxVec);
-            if(READ_FLAG)
+            if (!READ_ONLY)
                 cv_ptr->notify_one();
             return vec.at(pos);
         }
@@ -131,23 +156,22 @@ namespace sim
         {
             std::unique_lock<std::mutex> wait_lock(muxVec);
 
-            //change cv_ptr to custom ptr if necessary
+            // change cv_ptr to custom ptr if necessary
             bool CHANGED_CVPTR = false;
             std::shared_ptr<std::condition_variable> prev_ptr = cv_ptr;
 
-            if(custom_ptr)
+            if (custom_ptr)
             {
                 cv_ptr = custom_ptr;
                 CHANGED_CVPTR = true;
             }
 
-            //actual wait -> may want to add a loop with appropriate condition here
+            // actual wait -> may want to add a loop with appropriate condition here
             cv_ptr->wait(wait_lock);
 
-            //change ptr back if it was changed
-            if(CHANGED_CVPTR)
+            // change ptr back if it was changed
+            if (CHANGED_CVPTR)
                 cv_ptr = prev_ptr;
         }
-
     };
 }

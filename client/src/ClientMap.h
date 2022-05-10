@@ -10,7 +10,7 @@ namespace sim
         ClientMap(WinConsole &, params::MapConfig &, TSVector<Entity> *);
         virtual ~ClientMap();
     
-        virtual void run(size_t update_freq = -1) override;
+        virtual void run(size_t update_freq = 1) override;
     
     private:
 

@@ -39,7 +39,7 @@ namespace sim
         size_t wakeup_calls = 0;
         std::shared_ptr<std::condition_variable> custom_cond = std::make_shared<std::condition_variable>();
 
-        while(wakeup_calls <= update_freq)
+        while(wakeup_calls < update_freq)
         {
             mptr_entities_external->wait(custom_cond);
             ++wakeup_calls;
