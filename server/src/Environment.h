@@ -4,6 +4,7 @@
 #include "Params.h"
 #include "Map.h"
 #include "Entity.h"
+#include "TSVector.h"
 
 namespace sim
 {
@@ -16,10 +17,10 @@ namespace sim
     class Environment : public Map
     {
     public:
-        Environment(WinConsole &, params::MapConfig &, int, std::vector<std::vector<Entity>>&);
+        Environment(WinConsole &, params::MapConfig &, int, TSVector<TSVector<Entity>>*);
         virtual ~Environment();
         
-        void start() override;
+        virtual void run(size_t update_freq = -1) override;
 
         std::shared_ptr<Entity> check_pos(size_t,size_t);
 
