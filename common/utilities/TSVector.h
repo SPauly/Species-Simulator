@@ -107,7 +107,7 @@ namespace sim
         void push_back(const T &item)
         {
             std::scoped_lock lock(muxVec);
-            vec.emplace_back(std::move(item));
+            vec.push_back(std::move(item));
             cv_ptr->notify_one();
             return;
         }
