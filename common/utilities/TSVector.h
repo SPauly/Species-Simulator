@@ -64,7 +64,7 @@ namespace sim
         TSVector<T> &operator=(const std::vector<T> &new_vec)
         {
             std::scoped_lock lock(muxVec);
-
+            
             if (this->vec == &new_vec)
                 return this;
 
@@ -73,11 +73,9 @@ namespace sim
             return this;
         }
 
-        const T &at(size_t pos, bool READ_ONLY = true)
+        const T &at(size_t pos) //read only
         {
             std::scoped_lock lock(muxVec);
-            if (!READ_ONLY)
-                cv_ptr->notify_one();
             return vec.at(pos);
         }
 
@@ -98,6 +96,10 @@ namespace sim
             return vec.back();
         }
 
+        void lock()
+        {
+
+        }
         T *data()
         {
             std::scoped_lock lock(muxVec);
