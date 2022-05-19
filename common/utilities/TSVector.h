@@ -69,8 +69,8 @@ namespace sim
                 return this;
 
             std::copy(new_vec.begin(), new_vec.end(), std::back_inserter(vec));
-            cv_ptr->notify_one();
-            return this;
+
+            return *this;
         }
 
         const T &at(size_t pos) //read only
@@ -96,21 +96,21 @@ namespace sim
             return vec.back();
         }
 
-        void lock()
-        {
-
-        }
-        T *data()
-        {
-            std::scoped_lock lock(muxVec);
-            return vec.data();
-        }
-
         void push_back(const T &item)
         {
             std::scoped_lock lock(muxVec);
             vec.push_back(std::move(item));
             cv_ptr->notify_one();
+            return;
+        }
+
+        template <typename T>
+        void push_back(const *T beg, size_t elements)
+        {
+            std::scoped_lock lock(muxVec); 
+            T* cached_location = vec.back() + 1;
+            vec.resize(vec.size() + new_size);
+            std::memcpy(cached_location, beg, sizeof(T) * elements);
             return;
         }
 
@@ -174,6 +174,14 @@ namespace sim
             // change ptr back if it was changed
             if (CHANGED_CVPTR)
                 cv_ptr = prev_ptr;
+        }
+
+        size_t move_into(const T* beg, size_t elements)
+        {
+                delete[] beg;
+                beg = new T[elements];
+            
+            std::scoped_lock<std::mutex> lock(muxVec);
         }
     };
 }
