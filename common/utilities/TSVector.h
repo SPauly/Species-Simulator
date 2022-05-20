@@ -3,32 +3,60 @@
 #include <vector>
 #include <thread>
 #include <mutex>
+#include <shared_mutex>
 #include <condition_variable>
 
 namespace sim
 {
     template <typename T>
+    struct HelperType
+    {
+        mutable std::shared_mutex mux{};
+        T obj;
+
+        HelperType() = default;
+        
+        HelperType(const T &_obj) : obj(_obj)
+        {
+        }
+
+        HelperType(const HelperType<T> &_obj)
+        {
+            std::unique_lock<std::shared_mutex> lock(mux);
+            obj = _obj.obj;
+        }
+
+        HelperType<T> &operator=(const T &new_item)
+        {
+            std::unique_lock<std::shared_mutex> lock(mux);
+            obj = new_item;
+            return *this;
+        }
+    };
+
+    template <typename T>
     class TSVector
     {
     protected:
-        std::mutex muxVec;
-        std::vector<T> vec;
-        std::shared_ptr<std::condition_variable> cv_ptr = nullptr;
+        bool BLOCKED = false;
+        mutable std::shared_mutex muxVec;
+        std::vector<HelperType<T>> vec;
+        std::shared_ptr<std::condition_variable_any> cv_ptr = nullptr;
 
     public:
         TSVector()
         {
-            cv_ptr = std::make_shared<std::condition_variable>();
+            cv_ptr = std::make_shared<std::condition_variable_any>();
         }
-        TSVector(std::shared_ptr<std::condition_variable> cv)
+        TSVector(std::shared_ptr<std::condition_variable_any> cv)
             : cv_ptr(cv)
         {
             if (!cv_ptr)
-                cv_ptr = std::make_shared<std::condition_variable>();
+                cv_ptr = std::make_shared<std::condition_variable_any>();
         }
         TSVector(const TSVector<T> &new_vec)
         {
-            std::scoped_lock lock(muxVec);
+            std::unique_lock<std::shared_mutex> lock(muxVec);
             vec = new_vec.vec;
             cv_ptr = new_vec.cv_ptr;
         };
@@ -43,7 +71,7 @@ namespace sim
     public:
         TSVector<T> &operator=(const TSVector<T> &&new_vec)
         {
-            std::scoped_lock lock(muxVec);
+            std::unique_lock<std::shared_mutex> lock(muxVec);
 
             vec = new_vec.vec;
             cv_ptr = new_vec.cv_ptr;
@@ -55,7 +83,7 @@ namespace sim
 
         TSVector<T> &operator=(const TSVector<T> &new_vec)
         {
-            std::scoped_lock lock(muxVec);
+            std::unique_lock<std::shared_mutex> lock(muxVec);
 
             vec = new_vec.vec;
             cv_ptr = new_vec.cv_ptr;
@@ -67,81 +95,74 @@ namespace sim
 
         TSVector<T> &operator=(const std::vector<T> &new_vec)
         {
-            std::scoped_lock lock(muxVec);
+            std::unique_lock<std::shared_mutex> lock(muxVec);
 
-            if (this->vec.data() == new_vec.data())
-                return *this;
+            if (new_vec.size() != vec.size())
+                vec.resize(new_vec.size());
 
-            std::copy(new_vec.begin(), new_vec.end(), std::back_inserter(vec)); //not thread save
+            for (unsigned int i = 0; i < new_vec.size(); i++)
+            {
+                vec.at(i) = new_vec.at(i);
+            }
 
             cv_ptr->notify_one();
             return *this;
         }
 
-        const T &at(size_t pos) // read only
+        const T &at(size_t pos)
         {
-            std::scoped_lock lock(muxVec);
-            return vec.at(pos);
+            std::shared_lock<std::shared_mutex> lock(muxVec);
+            return vec.at(pos).obj;
         }
 
-        std::vector<T> *const raw() // warning! this function enables non threadsave access to vector
+        HelperType<T> &at_mutable(size_t pos)
         {
-            return &vec;
+            std::shared_lock<std::shared_mutex> lock(muxVec);
+            cv_ptr->notify_one();
+            return vec.at(pos);
         }
 
         const T &front()
         {
-            std::scoped_lock lock(muxVec);
-            return vec.front();
+            std::shared_lock<std::shared_mutex> lock(muxVec);
+            return vec.front().obj;
         }
 
         const T &back()
         {
-            std::scoped_lock lock(muxVec);
-            return vec.back();
+            std::shared_lock<std::shared_mutex> lock(muxVec);
+            return vec.back().obj;
         }
 
         void push_back(const T &item)
         {
-            std::scoped_lock lock(muxVec);
-            vec.push_back(std::move(item));
-            cv_ptr->notify_one();
-            return;
-        }
-
-        //not thread save yet
-        template <typename PUSH_TYPE>
-        void push_back(const PUSH_TYPE *beg, size_t elements)
-        {
-            std::scoped_lock lock(muxVec);
-            PUSH_TYPE *cached_location = vec.back() + 1;
-            vec.resize(vec.size() + elements);
-            memcpy(cached_location, beg, sizeof(PUSH_TYPE) * elements);
+            std::unique_lock<std::shared_mutex> lock(muxVec);
+            vec.push_back(HelperType<T>{std::move(item)});
             cv_ptr->notify_one();
             return;
         }
 
         bool empty()
         {
-            std::scoped_lock lock(muxVec);
+            std::shared_lock<std::shared_mutex> lock(muxVec);
             return vec.empty();
         }
 
         size_t size()
         {
-            std::scoped_lock lock(muxVec);
+            std::shared_lock<std::shared_mutex> lock(muxVec);
             return vec.size();
         }
 
         void clear()
         {
-            std::scoped_lock lock(muxVec);
+            std::unique_lock<std::shared_mutex> lock(muxVec);
             vec.clear();
         }
 
         T pop_back()
         {
-            std::scoped_lock lock(muxVec);
+            std::unique_lock<std::shared_mutex> lock(muxVec);
             auto t = std::move(vec.back());
             vec.pop_back();
             return t;
@@ -149,25 +170,25 @@ namespace sim
 
         void resize(size_t size)
         {
-            std::scoped_lock lock(muxVec);
+            std::unique_lock<std::shared_mutex> lock(muxVec);
             vec.resize(size);
             return;
         }
 
         void resize(size_t size, const T &init_var)
         {
-            std::scoped_lock lock(muxVec);
+            std::unique_lock<std::shared_mutex> lock(muxVec);
             vec.resize(size, init_var);
             return;
         }
 
-        void wait(std::shared_ptr<std::condition_variable> custom_ptr = nullptr)
+        void wait(std::shared_ptr<std::condition_variable_any> custom_ptr = nullptr)
         {
-            std::unique_lock<std::mutex> wait_lock(muxVec);
+            std::unique_lock<std::shared_mutex> wait_lock(muxVec);
 
             // change cv_ptr to custom ptr if necessary
             bool CHANGED_CVPTR = false;
-            std::shared_ptr<std::condition_variable> prev_ptr = cv_ptr;
+            std::shared_ptr<std::condition_variable_any> prev_ptr = cv_ptr;
 
             if (custom_ptr)
             {

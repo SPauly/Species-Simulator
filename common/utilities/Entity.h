@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <thread>
 #include <mutex>
+#include <shared_mutex>
 #include "Params.h"
 
 namespace sim
@@ -16,8 +17,6 @@ namespace sim
 
         Entity(const Entity &new_ent)
         {
-            std::mutex mux_ent;
-            std::scoped_lock<std::mutex> lock(mux_ent);
             id = new_ent.id;
             x = new_ent.x;
             y = new_ent.y;
@@ -29,8 +28,18 @@ namespace sim
 
         Entity &operator=(const Entity &&new_ent)
         {
-            std::mutex mux_ent;
-            std::scoped_lock<std::mutex> lock(mux_ent);
+            id = new_ent.id;
+            x = new_ent.x;
+            y = new_ent.y;
+            velo_x = new_ent.velo_x;
+            velo_y = new_ent.velo_y;
+            _char = new_ent._char;
+            type = new_ent.type;
+            return *this;
+        }
+
+        Entity &operator=(const Entity &new_ent)
+        {
             id = new_ent.id;
             x = new_ent.x;
             y = new_ent.y;
