@@ -35,7 +35,7 @@ namespace sim
         //main loop
         //wait for x number of updates in m_entities_external
         if(update_freq > mptr_entities_external->size())
-            update_freq = mptr_entities_external->size();
+            update_freq = 1;
         size_t wakeup_calls = 0;
         std::shared_ptr<std::condition_variable> custom_cond = std::make_shared<std::condition_variable>();
 
@@ -49,10 +49,15 @@ namespace sim
         //check for necessary connections that might have to be established
     }
     
+    void Map::update_entities()
+    {
+        update_entities(mptr_entities_external);
+    }
+
     void Map::update_entities(TSVector<Entity> *new_entities)
     {
-        if(!new_entities)
-            new_entities = mptr_entities_external;
+        mptr_entities_external = new_entities;
+        
         //downside of this is many new memory allocations have to be made, upside less CPU usage since I don't have to search for anything
         for(int i = 0; i < new_entities->size(); i++)
         {

@@ -48,6 +48,8 @@ namespace sim
             vec = new_vec.vec;
             cv_ptr = new_vec.cv_ptr;
 
+            cv_ptr->notify_one();
+
             return *this;
         }
 
@@ -58,22 +60,25 @@ namespace sim
             vec = new_vec.vec;
             cv_ptr = new_vec.cv_ptr;
 
+            cv_ptr->notify_one();
+
             return *this;
         }
-        
+
         TSVector<T> &operator=(const std::vector<T> &new_vec)
         {
             std::scoped_lock lock(muxVec);
-            
-            if (this->vec == &new_vec)
-                return this;
 
-            std::copy(new_vec.begin(), new_vec.end(), std::back_inserter(vec));
+            if (this->vec.data() == new_vec.data())
+                return *this;
 
+            std::copy(new_vec.begin(), new_vec.end(), std::back_inserter(vec)); //not thread save
+
+            cv_ptr->notify_one();
             return *this;
         }
 
-        const T &at(size_t pos) //read only
+        const T &at(size_t pos) // read only
         {
             std::scoped_lock lock(muxVec);
             return vec.at(pos);
@@ -104,13 +109,15 @@ namespace sim
             return;
         }
 
-        template <typename T>
-        void push_back(const *T beg, size_t elements)
+        //not thread save yet
+        template <typename PUSH_TYPE>
+        void push_back(const PUSH_TYPE *beg, size_t elements)
         {
-            std::scoped_lock lock(muxVec); 
-            T* cached_location = vec.back() + 1;
-            vec.resize(vec.size() + new_size);
-            std::memcpy(cached_location, beg, sizeof(T) * elements);
+            std::scoped_lock lock(muxVec);
+            PUSH_TYPE *cached_location = vec.back() + 1;
+            vec.resize(vec.size() + elements);
+            memcpy(cached_location, beg, sizeof(PUSH_TYPE) * elements);
+            cv_ptr->notify_one();
             return;
         }
 
@@ -174,14 +181,6 @@ namespace sim
             // change ptr back if it was changed
             if (CHANGED_CVPTR)
                 cv_ptr = prev_ptr;
-        }
-
-        size_t move_into(const T* beg, size_t elements)
-        {
-                delete[] beg;
-                beg = new T[elements];
-            
-            std::scoped_lock<std::mutex> lock(muxVec);
         }
     };
 }

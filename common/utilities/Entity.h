@@ -16,6 +16,8 @@ namespace sim
 
         Entity(const Entity &new_ent)
         {
+            std::mutex mux_ent;
+            std::scoped_lock<std::mutex> lock(mux_ent);
             id = new_ent.id;
             x = new_ent.x;
             y = new_ent.y;
@@ -28,7 +30,7 @@ namespace sim
         Entity &operator=(const Entity &&new_ent)
         {
             std::mutex mux_ent;
-            std::scoped_lock lock(mux_ent);
+            std::scoped_lock<std::mutex> lock(mux_ent);
             id = new_ent.id;
             x = new_ent.x;
             y = new_ent.y;

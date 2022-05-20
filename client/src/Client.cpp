@@ -25,14 +25,11 @@ namespace sim
         m_mapThread = std::thread([this]()
                                   { if(m_map) 
                                         m_map->run(); });
-        m_entities.at(2, false) = {100,100,100,0,0,params::EntityStyle::PLAYER,params::EntityType::PLAYEROBJECT}; 
-        
 
         // prime main thread with message distribution work
         while (true)
         {
-            m_entities.at(2, false) = {100,100,100,0,0,params::EntityStyle::PLAYER,params::EntityType::PLAYEROBJECT}; 
-            //update(-1, true); // runs the asio loop -> processes incomming messages
+            update(-1, true); // runs the asio loop -> processes incomming messages
         }
     }
 
@@ -40,6 +37,10 @@ namespace sim
     {
         switch (msg.header.id)
         {
+        case params::MessageType::Send_Entities:
+            msg.pull_complex<Entity>(msg, m_ent_buffer.data(), m_nentities_size);
+            m_entities = m_ent_buffer;
+            break;
         }
     }
 
@@ -72,10 +73,12 @@ namespace sim
                     case params::MessageType::Send_Entities_Size:
                         msg >> m_nentities_size;
                         m_entities.resize(m_nentities_size);
+                        m_ent_buffer.resize(m_nentities_size);
                         GOT_ENTITIES_SIZE = true;
                         break;
                     case params::MessageType::Send_Entities:
-                        msg.pull_complex<Entity>(msg, m_entities.data(), m_entities.size());
+                        msg.pull_complex<Entity>(msg, m_ent_buffer.data(), m_nentities_size);
+                        m_entities = m_ent_buffer;
                         m_map->update_entities(&m_entities);
                         GOT_ENTITIES = true;
                         if (GOT_CONSOLE && GOT_MAP && GOT_ENTITIES_SIZE && GOT_ENTITIES)

@@ -18,7 +18,8 @@ namespace sim
         virtual ~Map();
         
         virtual void run(size_t update_freq = -1);
-        void update_entities(TSVector<Entity>* new_entities = nullptr);
+        void update_entities();
+        void update_entities(TSVector<Entity>* new_entities);
         void render(bool);
         
         void draw_line(int, int, int, int, const char&);

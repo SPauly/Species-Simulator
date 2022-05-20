@@ -42,6 +42,7 @@ namespace sim
         std::thread m_mapThread; 
         params::MapConfig m_map_config;
         std::unique_ptr<sim::ClientMap> m_map;
+        std::vector<Entity> m_ent_buffer;
 
         //shared resources
         size_t m_nentities_size = 0;
