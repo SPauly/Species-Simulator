@@ -26,12 +26,13 @@ namespace sim
     Map::~Map()
     {
     }
+    
+    void Map::start_up(){
+        m_draw_walls();
+    }
 
     void Map::run(size_t update_freq) //set freq. to 
     {  
-        //start up 
-        m_draw_walls();
-
         //main loop
         //wait for x number of updates in m_entities_external
         if(update_freq > mptr_entities_external->size())

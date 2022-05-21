@@ -203,5 +203,19 @@ namespace sim
             if (CHANGED_CVPTR)
                 cv_ptr = prev_ptr;
         }
+
+        const std::vector<T> &get_vector()
+        {
+            std::vector<T> ret_vec;
+            
+            std::unique_lock<std::shared_mutex> lock(muxVec);
+
+            for(int i = 0; i < vec.size(); i++)
+            {
+                ret_vec.push_back(vec.at(i).obj);
+            }
+
+            return ret_vec;
+        }
     };
 }
