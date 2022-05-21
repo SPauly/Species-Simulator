@@ -8,6 +8,7 @@
 
 namespace sim
 {
+    //HelperType provides T with a shared_mutex to lock the element while writer accesses it
     template <typename T>
     struct HelperType
     {
@@ -204,7 +205,7 @@ namespace sim
                 cv_ptr = prev_ptr;
         }
 
-        const std::vector<T> &get_vector()
+        std::vector<T> get_vector()
         {
             std::vector<T> ret_vec;
             

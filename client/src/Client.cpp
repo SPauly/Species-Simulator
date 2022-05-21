@@ -39,7 +39,7 @@ namespace sim
         {
         case params::MessageType::Send_Entities:
             msg.pull_complex<Entity>(msg, m_ent_buffer.data(), m_nentities_size);
-            m_entities = m_ent_buffer;
+            m_entities = m_ent_buffer; // = operator overloaded to wakeup m_mapThread
             break;
         }
     }
@@ -67,7 +67,7 @@ namespace sim
                         break;
                     case params::MessageType::Send_Map_Layout:
                         msg >> m_map_config;
-                        m_map = std::make_unique<ClientMap>(m_console, m_map_config, &m_entities);
+                        m_map = std::make_unique<ClientMap>(m_console, m_map_config, &m_entities, &m_uptrConnection);
                         GOT_MAP = true;
                         break;
                     case params::MessageType::Send_Entities_Size:
