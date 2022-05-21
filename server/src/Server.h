@@ -8,6 +8,7 @@
 #include "Environment.h"
 #include "WinConsole.h"
 #include "Entity.h"
+#include "TSVector.h"
 
 namespace sim
 {
@@ -47,7 +48,9 @@ namespace sim
         size_t m_nMapsCount = DEFAULT_MAP_COUNT;
         params::MapConfig m_envConfig{0,0,0,0,params::MapType::No_Walls};
         std::unique_ptr<Environment> m_environment;
-        std::vector<std::vector<Entity>> m_incomming_entities; 
+
+        //shared resources
+        TSVector<TSVector<Entity>> m_incomming_entities; 
     };
 
 }

@@ -68,6 +68,13 @@ namespace sim // global namespace for species simulator
                 return body.size();
             }
 
+            void clear()
+            {
+                body.clear();
+                header.size = 0;
+                return;
+            }
+
             friend std::ostream &operator<<(std::ostream &os, const Message<T> msg) // overload << operator info about message into output stream for std::cout<<msg;
             {
                 os << "Message ID: " << int(msg.header.id) << " Message Size " << msg.header.size;

@@ -2,13 +2,13 @@
 
 namespace sim
 {
-    Map::Map(WinConsole &console, params::MapConfig &config) 
-        : Map(console,config, std::make_shared<TSConsoleBuffer>(config.width, config.height))
+    Map::Map(WinConsole &console, params::MapConfig &config, TSVector<Entity> *vecptr) 
+        : Map(console,config, vecptr, std::make_shared<TSConsoleBuffer>(config.width, config.height))
     {
     }
 
-    Map::Map(WinConsole &console, params::MapConfig &config, std::shared_ptr<TSConsoleBuffer> buffer)
-        : mptr_console(&console), m_config(config), m_buffer(buffer)
+    Map::Map(WinConsole &console, params::MapConfig &config, TSVector<Entity> *vecptr, std::shared_ptr<TSConsoleBuffer> buffer)
+        : mptr_console(&console), m_config(config), mptr_entities_external(vecptr), m_buffer(buffer)
     {
         m_entities_internal_map.resize(m_config.width * m_config.height, nullptr);
 
@@ -26,15 +26,39 @@ namespace sim
     Map::~Map()
     {
     }
-
-    void Map::start()
-    {
+    
+    void Map::start_up(){
         m_draw_walls();
     }
+
+    void Map::run(size_t update_freq) //set freq. to 
+    {  
+        //main loop
+        //wait for x number of updates in m_entities_external
+        if(update_freq > mptr_entities_external->size())
+            update_freq = 1;
+        size_t wakeup_calls = 0;
+        std::shared_ptr<std::condition_variable_any> custom_cond = std::make_shared<std::condition_variable_any>();
+
+        while(wakeup_calls < update_freq)
+        {
+            mptr_entities_external->wait(custom_cond);
+            ++wakeup_calls;
+        }
+        //update entities accourdingly
+        update_entities();
+        //check for necessary connections that might have to be established
+    }
     
-    void Map::update_entities(std::vector<Entity> *new_entities)
+    void Map::update_entities()
+    {
+        update_entities(mptr_entities_external);
+    }
+
+    void Map::update_entities(TSVector<Entity> *new_entities)
     {
         mptr_entities_external = new_entities;
+        
         //downside of this is many new memory allocations have to be made, upside less CPU usage since I don't have to search for anything
         for(int i = 0; i < new_entities->size(); i++)
         {
@@ -43,10 +67,10 @@ namespace sim
             //write to new position
             m_entities_internal_map.at(new_entities->at(i).y * m_config.width + new_entities->at(i).x) = std::make_shared<Entity>(new_entities->at(i));
         }
-        render();
+        render(true);
     }
 
-    void Map::render()
+    void Map::render(bool WRITE_TO_BUFFER_ONLY = false)
     {
         for(int i = 0; i < m_entities_internal_map.size(); i++)
         {
@@ -55,7 +79,8 @@ namespace sim
                 m_buffer->write_character((m_entities_internal_map.at(i)->x + m_config.x), (m_entities_internal_map.at(i)->y + m_config.y), (char)m_entities_internal_map.at(i)->_char);
             }
         }
-        mptr_console->write_buffer(mptr_console->get_active_handle(), *m_buffer);
+        if(!WRITE_TO_BUFFER_ONLY)
+            mptr_console->write_buffer(mptr_console->get_active_handle(), *m_buffer);
     }
 
     std::shared_ptr<Entity> Map::check_pos(size_t x, size_t y)
@@ -193,7 +218,7 @@ namespace sim
         return m_conLay;
     }
 
-    std::vector<Entity> *Map::get_entities_vec()
+    TSVector<Entity> *Map::get_entities_vec()
     {
         return mptr_entities_external;
     }

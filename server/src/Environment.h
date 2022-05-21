@@ -4,6 +4,7 @@
 #include "Params.h"
 #include "Map.h"
 #include "Entity.h"
+#include "TSVector.h"
 
 namespace sim
 {
@@ -16,10 +17,10 @@ namespace sim
     class Environment : public Map
     {
     public:
-        Environment(WinConsole &, params::MapConfig &, int, std::vector<std::vector<Entity>>&);
+        Environment(WinConsole &, params::MapConfig &, int, TSVector<TSVector<Entity>>*);
         virtual ~Environment();
         
-        void start() override;
+        virtual void run(size_t update_freq = -1) override;
 
         std::shared_ptr<Entity> check_pos(size_t,size_t);
 
@@ -38,6 +39,6 @@ namespace sim
 
         std::vector<Map> m_maps;
 
-        std::vector<std::vector<Entity>> *mptr_incomming_entities; // A pointer to a vector of vectors of Entities -> used to hold different pointers to different vectors of incomming Entities
+        TSVector<TSVector<Entity>> *mptr_incomming_entities; // A pointer to a vector of vectors of Entities -> used to hold different pointers to different vectors of incomming Entities
     };
 }

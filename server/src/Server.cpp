@@ -7,12 +7,12 @@ namespace sim
                                                         m_nMapsCount(nmapSize_)
     {
         // initialize vectors needed for transfer of Entities
-        m_incomming_entities.resize(m_nMapsCount, std::vector<Entity>());
+        m_incomming_entities.resize(m_nMapsCount, TSVector<Entity>());
 
         // create environment with the specific coordinates
         m_envConfig.width = x;
         m_envConfig.height = 30;
-        m_environment = std::make_unique<Environment>(m_console, m_envConfig, m_nMapsCount, m_incomming_entities);
+        m_environment = std::make_unique<Environment>(m_console, m_envConfig, m_nMapsCount, &m_incomming_entities);
     }
 
     void Server::mf_get_config()
@@ -21,7 +21,7 @@ namespace sim
 
     void Server::run(size_t nMaxMesseges = -1, bool bWait = false)
     {
-        m_environment->start();
+        m_environment->run();
         
         if (!this->start_server())
         {

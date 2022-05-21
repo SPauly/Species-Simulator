@@ -4,25 +4,24 @@
 
 namespace sim
 {
-    Environment::Environment(WinConsole &_winconsole, params::MapConfig &_config, int _nmaps, std::vector<std::vector<Entity>> &_incomming_vec)
+    Environment::Environment(WinConsole &_winconsole, params::MapConfig &_config, int _nmaps, TSVector<TSVector<Entity>> *_incomming_vec)
         : Map(_winconsole, _config), m_map_count(_nmaps)
     {
         // instantiate dimensions of each map
         m_map_width = m_config.width / m_map_count;
         m_map_height = m_config.height;
 
-        mptr_incomming_entities = &_incomming_vec;
+        mptr_incomming_entities = _incomming_vec;
     }
 
     Environment::~Environment()
     {
     }
 
-    void Environment::start()
+    void Environment::run(size_t update_freq)
     {
         m_instanciate_maps();
         m_create_entities();
-        Map::start();
     }
 
     void Environment::m_create_entities()
@@ -71,8 +70,7 @@ namespace sim
 
             // set offset in Mapconfig
             temp_config.x = i * m_map_width;
-            m_maps.push_back({*mptr_console, temp_config, m_buffer});
-            m_maps.at(i).start();
+            m_maps.push_back({*mptr_console, temp_config, &mptr_incomming_entities->at(i),m_buffer});
         }
     }
 
