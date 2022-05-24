@@ -21,9 +21,6 @@ namespace sim
         void run(size_t, bool); //arg: Max Number of Messages processed, bwait, number of Maps/Clients calls start_server, update Server and runs server
 
     private:    
-        bool mf_start_work_thread();
-        void mf_update_work();
-
         void mf_get_config();
         void test_console();
 
@@ -41,13 +38,12 @@ namespace sim
         int y = 44;
     	WinConsole m_console{0,0,x,y,8,16};
 
-        //work thread
-        std::thread m_WorkThread;
-
         //environment related
         size_t m_nMapsCount = DEFAULT_MAP_COUNT;
         params::MapConfig m_envConfig{0,0,0,0,params::MapType::No_Walls};
         std::unique_ptr<Environment> m_environment;
+        //work thread
+        std::thread m_EnvThread;
 
         //shared resources
         TSVector<TSVector<Entity>> m_incomming_entities; 

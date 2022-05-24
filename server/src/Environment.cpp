@@ -16,12 +16,41 @@ namespace sim
 
     Environment::~Environment()
     {
+        bRUNNING = false;
+        //join map threads
+        for (int i = 0; i < m_maps.size(); i++)
+        {
+            if(m_mapThreads.at(i).joinable())
+                m_mapThreads.at(i).join();
+        }
+
     }
 
     void Environment::run(size_t update_freq)
     {
         m_instanciate_maps();
         m_create_entities();
+
+        bRUNNING = true;
+        
+        //start threads to update Maps asynchronously
+        for (int i = 0; i < m_maps.size(); i++)
+        {
+            m_mapThreads.push_back(std::thread([this, i]()
+                                               {
+                while(bRUNNING){
+                    m_maps.at(i).run();
+                } }));
+        }
+
+        //main loop
+        while(bRUNNING)
+        {
+            //render
+            //distribute incomming connections
+            
+        }
+
     }
 
     void Environment::m_create_entities()
@@ -70,7 +99,7 @@ namespace sim
 
             // set offset in Mapconfig
             temp_config.x = i * m_map_width;
-            m_maps.push_back({*mptr_console, temp_config, &mptr_incomming_entities->at(i),m_buffer});
+            m_maps.push_back({*mptr_console, temp_config, &mptr_incomming_entities->at(i), m_buffer});
         }
     }
 
