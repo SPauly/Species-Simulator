@@ -118,6 +118,6 @@ namespace sim
             }
         }
 
-        m_console.write_buffer(m_console.get_active_handle(), m_buffer);
+       m_console.write_buffer(std::make_shared<TSConsoleBuffer>(m_buffer));
     }
 }

@@ -40,16 +40,14 @@ namespace sim
                                                {
                 while(bRUNNING){
                     m_maps.at(i).run();
-                    //render
-                    m_maps.at(i).mptr_console->write_buffer()
                     //send incomming connections to main distribution queue
-
                 } }));
         }
 
         //main loop
         while(bRUNNING)
         {
+            mptr_console->write_buffer(m_buffer);
             //distribute incomming connections in main distribution queue
         }
 

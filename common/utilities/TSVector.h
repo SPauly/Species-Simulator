@@ -33,6 +33,13 @@ namespace sim
             obj = new_item;
             return *this;
         }
+
+        HelperType<T> &operator=(const HelperType<T> &new_item)
+        {
+            std::unique_lock<std::shared_mutex> lock(mux);
+            obj = new_item.obj;
+            return *this;
+        }
     };
 
     template <typename T>

@@ -3,6 +3,7 @@
 #include <windows.h>
 #include <stdexcept>
 #include <algorithm>
+#include <memory>
 
 namespace sim
 {
@@ -36,8 +37,7 @@ namespace sim
         bool create_console(size_t, size_t, size_t, size_t, size_t, size_t);
         bool create_console(params::WinConsoleLayout&);
 
-        size_t write_buffer(HANDLE, TSConsoleBuffer&); /*prefered function since the overload is untested so far */
-        size_t write_buffer(HANDLE, TSConsoleBuffer&, params::WinConsoleLayout&);
+        size_t write_buffer(std::shared_ptr<TSConsoleBuffer>, HANDLE *handle_ = nullptr);
 
         HANDLE& get_active_handle();
         params::WinConsoleLayout& get_layout();
@@ -49,7 +49,7 @@ namespace sim
         SMALL_RECT _rectWindow;
         COORD coord;
 
-        TSConsoleBuffer  _screen;
+        std::shared_ptr<TSConsoleBuffer>  _ptr_screen_buf = nullptr;
         HANDLE _hConsole;
         HANDLE _hConsoleOrigin;
         CONSOLE_SCREEN_BUFFER_INFO _csbi;

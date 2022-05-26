@@ -160,32 +160,19 @@ namespace sim
         return bSuccess;
     }
 
-    size_t WinConsole::write_buffer(HANDLE handle_ = nullptr, TSConsoleBuffer &buf_)
+    size_t WinConsole::write_buffer(std::shared_ptr<TSConsoleBuffer> buf_, HANDLE *handle_)
     {
-        if (handle_ == INVALID_HANDLE_VALUE || !handle_)
+        if (*handle_ == INVALID_HANDLE_VALUE || !handle_)
         {
-            handle_ = _hConsole;
+            *handle_ = _hConsole;
         }
 
-        if (buf_.width > 0 && buf_.width <= _layout._nScreenWidth && buf_.height > 0 && buf_.height <= _layout._nScreenHeight)
-            _screen = buf_;
+        if (buf_->width > 0 && buf_->width <= _layout._nScreenWidth && buf_->height > 0 && buf_->height <= _layout._nScreenHeight)
+            _ptr_screen_buf = buf_;
         else
             return 0;
 
-        WriteConsoleOutput(handle_, _screen.get_buffer(), {(SHORT)_screen.width, (SHORT)_screen.height}, {0, 0}, &_rectWindow);
-    }
-
-    size_t WinConsole::write_buffer(HANDLE handle_, TSConsoleBuffer &buf_, params::WinConsoleLayout &conLay_)
-    {
-        if (handle_ == INVALID_HANDLE_VALUE)
-            return 0;
-
-        if (buf_.width > 0 && buf_.width <= conLay_._nScreenWidth && buf_.height > 0 && buf_.height <= conLay_._nScreenHeight)
-            _screen = buf_;
-        else
-            return 0;
-
-        WriteConsoleOutput(handle_, _screen.get_buffer(), {(SHORT)conLay_._nScreenWidth, (SHORT)conLay_._nScreenHeight}, {(SHORT)conLay_._nxpos, (SHORT)conLay_._nypos}, &_rectWindow);
+        WriteConsoleOutput(*handle_, _ptr_screen_buf->get_buffer(), {(SHORT)_ptr_screen_buf->width, (SHORT)_ptr_screen_buf->height}, {0, 0}, &_rectWindow);
     }
 
     HANDLE &WinConsole::get_active_handle()
