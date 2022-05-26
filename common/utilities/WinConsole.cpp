@@ -160,10 +160,12 @@ namespace sim
         return bSuccess;
     }
 
-    size_t WinConsole::write_buffer(HANDLE handle_, TSConsoleBuffer &buf_)
+    size_t WinConsole::write_buffer(HANDLE handle_ = nullptr, TSConsoleBuffer &buf_)
     {
-        if (handle_ == INVALID_HANDLE_VALUE)
-            return 0;
+        if (handle_ == INVALID_HANDLE_VALUE || !handle_)
+        {
+            handle_ = _hConsole;
+        }
 
         if (buf_.width > 0 && buf_.width <= _layout._nScreenWidth && buf_.height > 0 && buf_.height <= _layout._nScreenHeight)
             _screen = buf_;

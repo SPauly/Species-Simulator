@@ -110,7 +110,8 @@ namespace sim
             return *this;
         }
 
-        const T &at(size_t pos)
+        //!!! use at_mutable() instead if T has to be thread save
+        T &at(size_t pos)
         {
             std::shared_lock<std::shared_mutex> lock(muxVec);
             return vec.at(pos).obj;

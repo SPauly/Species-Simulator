@@ -67,7 +67,7 @@ namespace sim
         ent_msg << m_environment->at_get_map(this->get_connections() - 1).get_entities_size();
         client->send(ent_msg);
         ent_msg.header.id = params::MessageType::Send_Entities;
-        ent_msg.push_back_complex<Entity>(ent_msg, m_incomming_entities.at(this->get_connections() - 1).data(), m_incomming_entities.at(this->get_connections() - 1).size());
+        ent_msg.push_back_complex<Entity>(ent_msg, m_incomming_entities.at(this->get_connections() - 1).get_vector().data(), m_incomming_entities.at(this->get_connections() - 1).size());
         client->send(ent_msg);
     }
 
