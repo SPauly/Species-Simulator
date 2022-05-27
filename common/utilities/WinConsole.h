@@ -21,7 +21,7 @@ namespace sim
 
         void write_character(size_t, const char&);  //write character to real position
         void write_character(size_t, size_t, const char&);    //write character to relative position of x and y
-        void write_buffer_to_console(WinConsole*, HANDLE *handle_ = nullptr);
+        void write_buffer_to_console(WinConsole*, HANDLE handle_ = nullptr);
 
         const CHAR_INFO *get_buffer();
         const size_t &get_width();
@@ -46,7 +46,7 @@ namespace sim
         bool create_console(size_t, size_t, size_t, size_t, size_t, size_t);
         bool create_console(params::WinConsoleLayout&);
 
-        size_t write_raw_buffer(CHAR_INFO *, size_t, size_t, HANDLE *handle_ = nullptr);
+        size_t write_raw_buffer(CHAR_INFO *, size_t, size_t, HANDLE handle_ = nullptr);
 
         HANDLE& get_active_handle();
         params::WinConsoleLayout& get_layout();

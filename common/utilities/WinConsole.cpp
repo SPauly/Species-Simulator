@@ -66,7 +66,7 @@ namespace sim
         }
     }
 
-    void TSConsoleBuffer::write_buffer_to_console(WinConsole* con_ptr_, HANDLE *handle_)
+    void TSConsoleBuffer::write_buffer_to_console(WinConsole* con_ptr_, HANDLE handle_)
     {
         std::shared_lock<std::shared_mutex> lock(mux);
 
@@ -178,14 +178,14 @@ namespace sim
         return bSuccess;
     }
 
-    size_t WinConsole::write_raw_buffer(CHAR_INFO *buf_, size_t width_, size_t height_, HANDLE *handle_)
+    size_t WinConsole::write_raw_buffer(CHAR_INFO *buf_, size_t width_, size_t height_, HANDLE handle_)
     {
-        if (*handle_ == INVALID_HANDLE_VALUE || !handle_)
+        if (handle_ == INVALID_HANDLE_VALUE || !handle_)
         {
-            *handle_ = _hConsole;
+            handle_ = _hConsole;
         }
 
-        WriteConsoleOutput(*handle_, buf_, {(SHORT)width_, (SHORT)height_}, {0, 0}, &_rectWindow);
+        WriteConsoleOutput(handle_, buf_, {(SHORT)width_, (SHORT)height_}, {0, 0}, &_rectWindow);
     }
 
     HANDLE &WinConsole::get_active_handle()
