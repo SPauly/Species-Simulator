@@ -80,7 +80,7 @@ namespace sim
             }
         }
         if(!WRITE_TO_BUFFER_ONLY)
-            mptr_console->write_buffer(m_buffer);
+            m_buffer->write_buffer_to_console(mptr_console);
     }
 
     std::shared_ptr<Entity> Map::check_pos(size_t x, size_t y)
@@ -206,7 +206,7 @@ namespace sim
             break;
         }
 
-        mptr_console->write_buffer(m_buffer);
+        m_buffer->write_buffer_to_console(mptr_console);
     }
 
     params::MapConfig& Map::get_config()

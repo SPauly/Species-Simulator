@@ -47,7 +47,7 @@ namespace sim
         //main loop
         while(bRUNNING)
         {
-            mptr_console->write_buffer(m_buffer);
+            m_buffer->write_buffer_to_console(mptr_console);
             //distribute incomming connections in main distribution queue
         }
 
@@ -89,7 +89,7 @@ namespace sim
         temp_config.WallOne = params::MapType::Bottom_Wall;
         temp_config.WallTwo = params::MapType::Top_Wall;
 
-        // decide on weather to draw left or right wall
+        // decide on wether to draw left or right wall
         for (int i = 0; i < m_map_count; i++)
         {
             if (i % 2 > 0)

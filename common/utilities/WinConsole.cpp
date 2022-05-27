@@ -22,8 +22,10 @@ namespace sim
         delete[] char_buffer;
     }
 
-    CHAR_INFO *TSConsoleBuffer::resize(size_t _size)
+    void TSConsoleBuffer::resize(size_t _size)
     {
+        std::unique_lock<std::shared_mutex> lock(mux);
+
         if(char_buffer)
             delete[] char_buffer;
         
@@ -36,13 +38,16 @@ namespace sim
         }
     }
 
-    CHAR_INFO *TSConsoleBuffer::get_buffer()
-    {
+    const CHAR_INFO *TSConsoleBuffer::get_buffer()
+    {  
+        std::shared_lock<std::shared_mutex> lock(mux);
         return char_buffer;
     }
 
     void TSConsoleBuffer::write_character(size_t real_pos, const char &ch_)
     {
+        std::unique_lock<std::shared_mutex> lock(mux);
+
         if (char_buffer && real_pos < width * height)
         {
             char_buffer[real_pos].Char.UnicodeChar = ch_;
@@ -52,11 +57,24 @@ namespace sim
 
     void TSConsoleBuffer::write_character(size_t xpos_, size_t ypos_, const char &ch_)
     {
+        std::unique_lock<std::shared_mutex> lock(mux);
+
         if (char_buffer && xpos_ >= 0 && xpos_ < width && ypos_ >= 0 && ypos_ < height)
         {
             char_buffer[ypos_ * width + xpos_].Char.UnicodeChar = ch_;
             char_buffer[ypos_ * width + xpos_].Attributes = 0x000F;
         }
+    }
+
+    void TSConsoleBuffer::write_buffer_to_console(WinConsole* con_ptr_, HANDLE *handle_)
+    {
+        std::shared_lock<std::shared_mutex> lock(mux);
+
+        if(!con_ptr_)
+            return;
+        
+        con_ptr_->write_raw_buffer(char_buffer, width, height, handle_);
+        return;
     }
 
     WinConsole::WinConsole(params::WinConsoleLayout &layout)
@@ -160,19 +178,14 @@ namespace sim
         return bSuccess;
     }
 
-    size_t WinConsole::write_buffer(std::shared_ptr<TSConsoleBuffer> buf_, HANDLE *handle_)
+    size_t WinConsole::write_raw_buffer(CHAR_INFO *buf_, size_t width_, size_t height_, HANDLE *handle_)
     {
         if (*handle_ == INVALID_HANDLE_VALUE || !handle_)
         {
             *handle_ = _hConsole;
         }
 
-        if (buf_->width > 0 && buf_->width <= _layout._nScreenWidth && buf_->height > 0 && buf_->height <= _layout._nScreenHeight)
-            _ptr_screen_buf = buf_;
-        else
-            return 0;
-
-        WriteConsoleOutput(*handle_, _ptr_screen_buf->get_buffer(), {(SHORT)_ptr_screen_buf->width, (SHORT)_ptr_screen_buf->height}, {0, 0}, &_rectWindow);
+        WriteConsoleOutput(*handle_, buf_, {(SHORT)width_, (SHORT)height_}, {0, 0}, &_rectWindow);
     }
 
     HANDLE &WinConsole::get_active_handle()
