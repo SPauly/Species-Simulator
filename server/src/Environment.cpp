@@ -28,6 +28,7 @@ namespace sim
 
     void Environment::run(size_t update_freq)
     {
+        start_up();
         m_instanciate_maps();
         m_create_entities();
 
