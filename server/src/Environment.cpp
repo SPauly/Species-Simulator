@@ -41,6 +41,7 @@ namespace sim
                                                {
                 while(bRUNNING){
                     m_maps.at(i).run();
+                    m_buffer->write_buffer_to_console(mptr_console);
                     //send incomming connections to main distribution queue
                 } }));
         }
@@ -48,7 +49,7 @@ namespace sim
         //main loop
         while(bRUNNING)
         {
-            m_buffer->write_buffer_to_console(mptr_console);
+            //render here for 30fps
             //distribute incomming connections in main distribution queue
         }
 

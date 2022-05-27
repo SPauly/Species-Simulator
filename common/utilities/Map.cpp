@@ -27,7 +27,7 @@ namespace sim
     {
     }
     
-    void Map::start_up(){
+    void Map::start_up(){ 
         m_draw_walls();
     }
 
