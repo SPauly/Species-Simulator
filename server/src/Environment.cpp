@@ -39,6 +39,7 @@ namespace sim
         {
             m_mapThreads.push_back(std::thread([this, i]()
                                                {
+                m_maps.at(i).start_up();
                 while(bRUNNING){
                     m_maps.at(i).run();
                     m_buffer->write_buffer_to_console(mptr_console);

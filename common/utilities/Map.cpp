@@ -70,7 +70,7 @@ namespace sim
         render(true);
     }
 
-    void Map::render(bool WRITE_TO_BUFFER_ONLY = false)
+    void Map::render(bool WRITE_TO_BUFFER_ONLY)
     {
         for(int i = 0; i < m_entities_internal_map.size(); i++)
         {
