@@ -33,6 +33,13 @@ namespace sim
             obj = new_item;
             return *this;
         }
+
+        HelperType<T> &operator=(const HelperType<T> &new_item)
+        {
+            std::unique_lock<std::shared_mutex> lock(mux);
+            obj = new_item.obj;
+            return *this;
+        }
     };
 
     template <typename T>
@@ -110,7 +117,8 @@ namespace sim
             return *this;
         }
 
-        const T &at(size_t pos)
+        //!!! use at_mutable() instead if T has to be thread save
+        T &at(size_t pos)
         {
             std::shared_lock<std::shared_mutex> lock(muxVec);
             return vec.at(pos).obj;

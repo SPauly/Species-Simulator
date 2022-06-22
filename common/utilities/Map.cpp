@@ -27,7 +27,7 @@ namespace sim
     {
     }
     
-    void Map::start_up(){
+    void Map::start_up(){ 
         m_draw_walls();
     }
 
@@ -70,7 +70,7 @@ namespace sim
         render(true);
     }
 
-    void Map::render(bool WRITE_TO_BUFFER_ONLY = false)
+    void Map::render(bool WRITE_TO_BUFFER_ONLY)
     {
         for(int i = 0; i < m_entities_internal_map.size(); i++)
         {
@@ -80,7 +80,7 @@ namespace sim
             }
         }
         if(!WRITE_TO_BUFFER_ONLY)
-            mptr_console->write_buffer(mptr_console->get_active_handle(), *m_buffer);
+            m_buffer->write_buffer_to_console(mptr_console);
     }
 
     std::shared_ptr<Entity> Map::check_pos(size_t x, size_t y)
@@ -206,7 +206,7 @@ namespace sim
             break;
         }
 
-        mptr_console->write_buffer(mptr_console->get_active_handle(), *m_buffer);
+        m_buffer->write_buffer_to_console(mptr_console);
     }
 
     params::MapConfig& Map::get_config()

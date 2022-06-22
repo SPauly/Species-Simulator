@@ -17,12 +17,12 @@ namespace sim
     {   
         start_up();
         //main loop
-        while (true)
+        while (true) //put condition here!
         {
             // fetch incomming Entities every update_freq changes to m_entities_external
             Map::run(update_freq);
             // update screen
-            mptr_console->write_buffer(mptr_console->get_active_handle(), *m_buffer);
+            m_buffer->write_buffer_to_console(mptr_console);
             // check for connected entities -> have a deque where incomming info for displayed entities and outgoing info for their sensor inputs is stored and then distribute them here
                 //send connections to server
             // send map to server

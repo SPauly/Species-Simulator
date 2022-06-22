@@ -21,15 +21,18 @@ namespace sim
 
     void Server::run(size_t nMaxMesseges = -1, bool bWait = false)
     {
-        m_environment->run();
-        
         if (!this->start_server())
         {
             // inform of failure
             return;
         }
 
-        if (!this->mf_start_work_thread())
+        try
+        {
+            m_EnvThread = std::thread([this]()
+                                      { m_environment->run(); });
+        }
+        catch (const std::exception &e)
         {
             // inform of failure
             return;
@@ -40,8 +43,8 @@ namespace sim
             this->update(nMaxMesseges, bWait);
         }
 
-        if (m_WorkThread.joinable())
-            m_WorkThread.join();
+        if (m_EnvThread.joinable())
+            m_EnvThread.join();
     }
 
     void Server::on_client_validated(std::shared_ptr<net::Connection<params::MessageType>> client)
@@ -64,7 +67,7 @@ namespace sim
         ent_msg << m_environment->at_get_map(this->get_connections() - 1).get_entities_size();
         client->send(ent_msg);
         ent_msg.header.id = params::MessageType::Send_Entities;
-        ent_msg.push_back_complex<Entity>(ent_msg, m_incomming_entities.at(this->get_connections() - 1).data(), m_incomming_entities.at(this->get_connections() - 1).size());
+        ent_msg.push_back_complex<Entity>(ent_msg, m_incomming_entities.at(this->get_connections() - 1).get_vector().data(), m_incomming_entities.at(this->get_connections() - 1).size());
         client->send(ent_msg);
     }
 
@@ -115,27 +118,6 @@ namespace sim
             }
         }
 
-        m_console.write_buffer(m_console.get_active_handle(), m_buffer);
-    }
-
-    bool Server::mf_start_work_thread()
-    {
-
-        // start work in thread
-        try
-        {
-            m_WorkThread = std::thread([this]()
-                                       { mf_update_work(); });
-        }
-        catch (const std::exception &e)
-        {
-            // inform of failure
-            return false;
-        }
-
-        return true;
-    }
-    void Server::mf_update_work()
-    {
+       m_buffer.write_buffer_to_console(&m_console);
     }
 }

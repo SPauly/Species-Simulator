@@ -16,12 +16,43 @@ namespace sim
 
     Environment::~Environment()
     {
+        bRUNNING = false;
+        //join map threads
+        for (int i = 0; i < m_maps.size(); i++)
+        {
+            if(m_mapThreads.at(i).joinable())
+                m_mapThreads.at(i).join();
+        }
+
     }
 
     void Environment::run(size_t update_freq)
     {
+        start_up();
         m_instanciate_maps();
         m_create_entities();
+
+        bRUNNING = true;
+        
+        //start threads to update Maps asynchronously
+        for (int i = 0; i < m_maps.size(); i++)
+        {
+            m_mapThreads.push_back(std::thread([this, i]()
+                                               {
+                m_maps.at(i).start_up();
+                while(bRUNNING){
+                    m_maps.at(i).run();
+                    //send incomming connections to main distribution queue
+                } }));
+        }
+
+        //main loop
+        //while(bRUNNING)
+        //{
+            //render here for 30fps
+            //distribute incomming connections in main distribution queue
+        //}
+
     }
 
     void Environment::m_create_entities()
@@ -60,7 +91,7 @@ namespace sim
         temp_config.WallOne = params::MapType::Bottom_Wall;
         temp_config.WallTwo = params::MapType::Top_Wall;
 
-        // decide on weather to draw left or right wall
+        // decide on wether to draw left or right wall
         for (int i = 0; i < m_map_count; i++)
         {
             if (i % 2 > 0)
@@ -70,7 +101,7 @@ namespace sim
 
             // set offset in Mapconfig
             temp_config.x = i * m_map_width;
-            m_maps.push_back({*mptr_console, temp_config, &mptr_incomming_entities->at(i),m_buffer});
+            m_maps.push_back({*mptr_console, temp_config, &mptr_incomming_entities->at(i), m_buffer});
         }
     }
 

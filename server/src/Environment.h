@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <vector>
+#include <thread>
 #include "Params.h"
 #include "Map.h"
 #include "Entity.h"
@@ -31,6 +32,7 @@ namespace sim
         void m_create_entities();
 
     private:
+        bool bRUNNING = false;
         int m_map_width = 0;
         int m_map_height = 0;
 
@@ -38,6 +40,7 @@ namespace sim
         uint64_t m_id_count = 0;
 
         std::vector<Map> m_maps;
+        std::vector<std::thread> m_mapThreads;
 
         TSVector<TSVector<Entity>> *mptr_incomming_entities; // A pointer to a vector of vectors of Entities -> used to hold different pointers to different vectors of incomming Entities
     };

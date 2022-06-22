@@ -21,7 +21,7 @@ namespace sim
         virtual void run(size_t update_freq = -1);
         void update_entities();
         void update_entities(TSVector<Entity>* new_entities);
-        void render(bool);
+        void render(bool WRITE_TO_BUFFER_ONLY = false);
         
         void draw_line(int, int, int, int, const char&);
 
