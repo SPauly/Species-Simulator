@@ -59,28 +59,25 @@ namespace sim
     {
         mptr_entities_external = new_entities;
         
+        uint16_t prev_x,prev_y;
+
         //downside of this is many new memory allocations have to be made, upside less CPU usage since I don't have to search for anything
         for(int i = 0; i < new_entities->size(); i++)
         {
+            prev_x = new_entities->at(i).x - new_entities->at(i).velo_x;
+            prev_y = new_entities->at(i).y - new_entities->at(i).velo_y;
             //delete the Entity at it's previous position
-            m_entities_internal_map.at((new_entities->at(i).y - new_entities->at(i).velo_y) * m_config.width + (new_entities->at(i).x - new_entities->at(i).velo_x)).reset();
+            m_entities_internal_map.at(prev_y * m_config.width + prev_x).reset();
+            m_buffer->write_character(prev_x, prev_y, ' ');
             //write to new position
             m_entities_internal_map.at(new_entities->at(i).y * m_config.width + new_entities->at(i).x) = std::make_shared<Entity>(new_entities->at(i));
+            m_buffer->write_character((new_entities->at(i).x + m_config.x), (new_entities->at(i).y + m_config.y), (char)new_entities->at(i)._char);
         }
-        render(true);
     }
 
-    void Map::render(bool WRITE_TO_BUFFER_ONLY)
+    void Map::render()
     {
-        for(int i = 0; i < m_entities_internal_map.size(); i++)
-        {
-            if(m_entities_internal_map.at(i))
-            {
-                m_buffer->write_character((m_entities_internal_map.at(i)->x + m_config.x), (m_entities_internal_map.at(i)->y + m_config.y), (char)m_entities_internal_map.at(i)->_char);
-            }
-        }
-        if(!WRITE_TO_BUFFER_ONLY)
-            m_buffer->write_buffer_to_console(mptr_console);
+        m_buffer->write_buffer_to_console(mptr_console);
     }
 
     std::shared_ptr<Entity> Map::check_pos(size_t x, size_t y)

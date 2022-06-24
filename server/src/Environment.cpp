@@ -47,11 +47,12 @@ namespace sim
         }
 
         //main loop
-        //while(bRUNNING)
-        //{
+        while(bRUNNING)
+        {
             //render here for 30fps
+            render();
             //distribute incomming connections in main distribution queue
-        //}
+        }
 
     }
 
