@@ -68,7 +68,7 @@ namespace sim
             prev_y = new_entities->at(i).y - new_entities->at(i).velo_y;
             //delete the Entity at it's previous position
             m_entities_internal_map.at(prev_y * m_config.width + prev_x).reset();
-            m_buffer->write_character(prev_x, prev_y, ' ');
+            m_buffer->write_character((prev_x + m_config.width), prev_y, ' ');
             //write to new position
             m_entities_internal_map.at(new_entities->at(i).y * m_config.width + new_entities->at(i).x) = std::make_shared<Entity>(new_entities->at(i));
             m_buffer->write_character((new_entities->at(i).x + m_config.x), (new_entities->at(i).y + m_config.y), (char)new_entities->at(i)._char);

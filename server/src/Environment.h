@@ -13,7 +13,7 @@ namespace sim
     static constexpr int MAX_MAPCOUNT = 2;
     static constexpr int DEFAULT_MAP_COUNT = 2;
     static constexpr int MAX_POPULATION_PER_MAP = 100;
-    static constexpr int MAX_FOOD_PER_MAP = 2000;
+    static constexpr int MAX_FOOD_PER_MAP = 3900;
 
     class Environment : public Map
     {
