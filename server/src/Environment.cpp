@@ -80,6 +80,25 @@ namespace sim
             }
             m_maps.at(map_counter).update_entities(&mptr_incomming_entities->at(map_counter));
         }
+        /*Add Players to each map*/
+        for (int map_counter = 0; map_counter < mptr_incomming_entities->size(); map_counter++)
+        {
+            for (int i = 0; i < MAX_POPULATION_PER_MAP; i++)
+            {
+                randx = sim::rand(1, m_map_width - 1);
+                randy = sim::rand(1, m_map_height - 1);
+
+                temp_entity.id = m_id_count;
+                temp_entity.x = randx;
+                temp_entity.y = randy;
+                temp_entity._char = params::EntityStyle::PLAYER;
+                temp_entity.type = params::EntityType::PLAYEROBJECT;
+
+                mptr_incomming_entities->at(map_counter).push_back(temp_entity);
+                ++m_id_count;
+            }
+            m_maps.at(map_counter).update_entities(&mptr_incomming_entities->at(map_counter));
+        }
     }
 
     void Environment::m_instanciate_maps()
