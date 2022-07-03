@@ -13,12 +13,11 @@ namespace sim
     {
     public:
         Map() = delete;
-        Map(WinConsole &, params::MapConfig &, TSVector<Entity> *vec_ptr = nullptr);
         Map(WinConsole &, params::MapConfig &, TSVector<Entity> *, std::shared_ptr<TSConsoleBuffer>);
         virtual ~Map();
         
         void start_up();
-        virtual void run(size_t update_freq = 1);
+        virtual void run(bool synced = false);
         void update_entities();
         void update_entities(TSVector<Entity>* new_entities);
         void render();

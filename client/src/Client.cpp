@@ -1,4 +1,5 @@
 #include "Client.h"
+#include "Rand.h"
 
 namespace sim
 {
@@ -12,7 +13,8 @@ namespace sim
     {
         if (m_mapThread.joinable())
             m_mapThread.join();
-
+        if (m_asio_update_thread.joinable())
+            m_asio_update_thread.join();
         disconnect();
     }
 
@@ -26,10 +28,19 @@ namespace sim
                                   { if(m_map) 
                                         m_map->run(); });
 
-        // prime main thread with message distribution work
-        while (true)
+
+        // prime asio thread with message distribution work
+        m_asio_update_thread = std::thread([this]()
+        { while (true)
         {
             update(-1, true); // runs the asio loop -> processes incomming messages
+        }
+        });
+
+        //prime main thread with 30fps rendering
+        while(true)
+        {
+            mptr_console_buffer->write_buffer_to_console(&m_console);
         }
     }
 
@@ -63,11 +74,12 @@ namespace sim
                         msg >> m_console_layout;
                         m_console_layout._nScreenHeight += 5; // leave space for stats
                         m_console.create_console(m_console_layout);
+                        mptr_console_buffer = std::make_shared<TSConsoleBuffer>(m_console_layout._nScreenWidth, m_console_layout._nScreenHeight);
                         GOT_CONSOLE = true;
                         break;
                     case params::MessageType::Send_Map_Layout:
                         msg >> m_map_config;
-                        m_map = std::make_unique<ClientMap>(m_console, m_map_config, &m_entities, &m_uptrConnection);
+                        m_map = std::make_unique<ClientMap>(m_console, m_map_config, &m_entities, mptr_console_buffer, &m_uptrConnection);
                         GOT_MAP = true;
                         break;
                     case params::MessageType::Send_Entities_Size:

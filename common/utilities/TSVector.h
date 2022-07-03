@@ -126,7 +126,7 @@ namespace sim
 
         HelperType<T> &at_mutable(size_t pos)
         {
-            std::shared_lock<std::shared_mutex> lock(muxVec);
+            std::unique_lock<std::shared_mutex> lock(muxVec);
             cv_ptr->notify_one();
             return vec.at(pos);
         }

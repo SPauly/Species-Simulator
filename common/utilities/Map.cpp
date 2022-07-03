@@ -2,11 +2,6 @@
 
 namespace sim
 {
-    Map::Map(WinConsole &console, params::MapConfig &config, TSVector<Entity> *vecptr) 
-        : Map(console,config, vecptr, std::make_shared<TSConsoleBuffer>(config.width, config.height))
-    {
-    }
-
     Map::Map(WinConsole &console, params::MapConfig &config, TSVector<Entity> *vecptr, std::shared_ptr<TSConsoleBuffer> buffer)
         : mptr_console(&console), m_config(config), mptr_entities_external(vecptr), m_buffer(buffer)
     {
@@ -31,22 +26,8 @@ namespace sim
         m_draw_walls();
     }
 
-    void Map::run(size_t update_freq) //set freq. to 
-    {  
-        //main loop
-        //wait for x number of updates in m_entities_external
-        size_t wakeup_calls = 0;
-        std::shared_ptr<std::condition_variable_any> custom_cond = std::make_shared<std::condition_variable_any>();
-
-        while(wakeup_calls < update_freq)
-        {
-            mptr_entities_external->wait(custom_cond);
-            ++wakeup_calls;
-        }
-        //update entities accourdingly
-        update_entities();
-        //check for necessary connections that might have to be established
-    }
+    void Map::run(bool synced) //set freq. to 
+    {}
     
     void Map::update_entities()
     {
@@ -60,6 +41,7 @@ namespace sim
         uint16_t new_x,new_y,prev_x,prev_y;
 
         //downside of this is many new memory allocations have to be made, upside less CPU usage since I don't have to search for anything
+        try{
         for(int i = 0; i < new_entities->size(); i++)
         {
             new_x = new_entities->at(i).x;
@@ -74,6 +56,11 @@ namespace sim
             //write to new position
             m_entities_internal_map.at(new_y * m_config.width + new_x) = std::make_shared<Entity>(new_entities->at(i));
             m_buffer->write_character((new_x + m_config.x), (new_y + m_config.y), (char)new_entities->at(i)._char);
+        }
+        }
+        catch(const std::out_of_range &e)
+        {
+            return;
         }
     }
 
