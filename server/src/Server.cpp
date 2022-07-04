@@ -8,7 +8,7 @@ namespace sim
     {
         // initialize vectors needed for transfer of Entities
         m_incomming_entities.resize(m_nMapsCount, TSVector<Entity>());
-        m_entities_buffer.resize(sim::MAX_POPULATION_PER_MAP + sim::MAX_FOOD_PER_MAP);
+        m_change_buffer.resize(m_nMapsCount);
         // create environment with the specific coordinates
         m_envConfig.width = x;
         m_envConfig.height = 30;
@@ -112,8 +112,9 @@ namespace sim
         switch (msg.header.id)
         {
         case params::MessageType::Send_Entities:
-            msg.pull_complex<Entity>(msg, m_entities_buffer.data(), sim::MAX_FOOD_PER_MAP + sim::MAX_POPULATION_PER_MAP);
-            m_incomming_entities.at(client->get_uid() - 10000) = m_entities_buffer; // = operator overloaded to wakeup m_mapThread
+            std::shared_ptr<std::vector<Entity>> temp_buf = std::make_shared<std::vector<Entity>>((msg.size()*8)/sizeof(Entity));
+            msg.pull_complex<Entity>(msg, temp_buf->data(), (msg.size()*8)/sizeof(Entity));
+            m_change_buffer.at(client->get_uid() - 10000).push_back(temp_buf);
             break;
         }
     }

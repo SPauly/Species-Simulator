@@ -50,7 +50,7 @@ namespace sim
 
         //shared resources
         TSVector<TSVector<Entity>> m_incomming_entities; 
-        std::vector<Entity> m_entities_buffer;
+        std::vector<net::TSQueue<std::shared_ptr<std::vector<Entity>>>> m_change_buffer; //buffer holds a vector of ques for each map with the incommming changes to entities
     };
 
 }

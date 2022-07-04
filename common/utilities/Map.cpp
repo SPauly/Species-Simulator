@@ -72,13 +72,13 @@ namespace sim
                 prev_x = new_x - mptr_entities_external->at(i).velo_x;
                 prev_y = new_y - mptr_entities_external->at(i).velo_y;
                 // delete the Entity at it's previous position
-                if (new_x != prev_x || new_y != prev_y || !efficiency_on)
+                if (new_x != prev_x || new_y != prev_y || !efficiency_on || mptr_entities_external->at(i).type == params::EntityType::PLAYEROBJECT)
                 {
-                    m_entities_internal_map.at(prev_y * m_config.width + prev_x).reset();
+                    m_entities_internal_map.at(prev_y * m_config.width + (prev_x + m_config.x)).reset();
                     m_buffer->write_character((prev_x + m_config.x), (prev_y + m_config.y), ' ');
 
                     // write to new position
-                    m_entities_internal_map.at(new_y * m_config.width + new_x) = std::make_shared<Entity>(mptr_entities_external->at(i));
+                    m_entities_internal_map.at(new_y * m_config.width + (new_x + m_config.x)) = std::make_shared<Entity>(mptr_entities_external->at(i));
                     m_buffer->write_character((new_x + m_config.x), (new_y + m_config.y), (char)mptr_entities_external->at(i)._char);
                 }
             }
