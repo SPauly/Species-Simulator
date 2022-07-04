@@ -12,7 +12,8 @@ namespace sim
         // create environment with the specific coordinates
         m_envConfig.width = x;
         m_envConfig.height = 30;
-        m_environment = std::make_unique<Environment>(m_console, m_envConfig, m_nMapsCount, &m_incomming_entities);
+        mptr_buffer = std::make_shared<TSConsoleBuffer>(x,y);
+        m_environment = std::make_unique<Environment>(m_console, m_envConfig, mptr_buffer, m_nMapsCount, &m_incomming_entities);
     }
 
     void Server::mf_get_config()
@@ -38,13 +39,23 @@ namespace sim
             return;
         }
 
+        m_asio_update_thread = std::thread([this, nMaxMesseges, bWait](){
         while (true)
         {
             this->update(nMaxMesseges, bWait);
         }
+        });
+
+        //rendering loop
+        while(true)
+        {
+            mptr_buffer->write_buffer_to_console(&m_console);
+        }
 
         if (m_EnvThread.joinable())
             m_EnvThread.join();
+        if (m_asio_update_thread.joinable())
+            m_asio_update_thread.join();
     }
 
     void Server::on_client_validated(std::shared_ptr<net::Connection<params::MessageType>> client)

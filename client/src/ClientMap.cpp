@@ -27,8 +27,7 @@ namespace sim
             //testing:
             for(int i = 0; i < 99; i++)
             {
-                mptr_entities_external->at_mutable(i + 500).obj.x += rand<int>(-2,2);
-                mptr_entities_external->at_mutable(i + 500).obj.y += rand<int>(-2,2);
+                mptr_entities_external->at_mutable(i + 500).obj.x += rand<int>(0,2);
             }
             update_entities();
             // check for connected entities -> have a deque where incomming info for displayed entities and outgoing info for their sensor inputs is stored and then distribute them here

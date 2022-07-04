@@ -18,10 +18,10 @@ namespace sim
     class Environment : public Map
     {
     public:
-        Environment(WinConsole &, params::MapConfig &, int, TSVector<TSVector<Entity>>*);
+        Environment(WinConsole &, params::MapConfig &, std::shared_ptr<TSConsoleBuffer>, int, TSVector<TSVector<Entity>>*);
         virtual ~Environment();
         
-        virtual void run(size_t update_freq = -1) override;
+        virtual void run(bool synced = false) override;
 
         std::shared_ptr<Entity> check_pos(size_t,size_t);
 

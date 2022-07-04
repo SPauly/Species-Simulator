@@ -4,8 +4,8 @@
 
 namespace sim
 {
-    Environment::Environment(WinConsole &_winconsole, params::MapConfig &_config, int _nmaps, TSVector<TSVector<Entity>> *_incomming_vec)
-        : Map(_winconsole, _config), m_map_count(_nmaps)
+    Environment::Environment(WinConsole &_winconsole, params::MapConfig &_config, std::shared_ptr<TSConsoleBuffer> _conbuf, int _nmaps, TSVector<TSVector<Entity>> *_incomming_vec)
+        : Map(_winconsole, _config, nullptr,_conbuf), m_map_count(_nmaps)
     {
         // instantiate dimensions of each map
         m_map_width = m_config.width / m_map_count;
@@ -17,16 +17,10 @@ namespace sim
     Environment::~Environment()
     {
         bRUNNING = false;
-        //join map threads
-        for (int i = 0; i < m_maps.size(); i++)
-        {
-            if(m_mapThreads.at(i).joinable())
-                m_mapThreads.at(i).join();
-        }
 
     }
 
-    void Environment::run(size_t update_freq)
+    void Environment::run(bool synced)
     {
         start_up();
         m_instanciate_maps();
@@ -37,23 +31,24 @@ namespace sim
         //start threads to update Maps asynchronously
         for (int i = 0; i < m_maps.size(); i++)
         {
-            m_mapThreads.push_back(std::thread([this, i]()
+            m_mapThreads.push_back(std::thread([this, i, synced]()
                                                {
                 m_maps.at(i).start_up();
                 while(bRUNNING){
-                    m_maps.at(i).run();
+                    //wait till new entities are postet to vec
+                    mptr_incomming_entities->at(i).wait(); 
+                    //update entities on screen
+                    m_maps.at(i).update_entities();
                     //send incomming connections to main distribution queue
                 } }));
         }
 
-        //main loop
-        while(bRUNNING)
+                //join map threads
+        for (int i = 0; i < m_maps.size(); i++)
         {
-            //render here for 30fps
-            render();
-            //distribute incomming connections in main distribution queue
+            if(m_mapThreads.at(i).joinable())
+                m_mapThreads.at(i).join();
         }
-
     }
 
     void Environment::m_create_entities()
@@ -103,9 +98,6 @@ namespace sim
 
     void Environment::m_instanciate_maps()
     {
-        // scale buffer to provide space for all maps
-        m_buffer = std::make_shared<TSConsoleBuffer>(m_config.width, m_config.height);
-
         // initiate layout for the maps
         params::MapConfig temp_config{0, 0, m_map_width, m_map_height};
         temp_config.WallOne = params::MapType::Bottom_Wall;
