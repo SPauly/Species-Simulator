@@ -8,11 +8,11 @@ namespace sim
     {
         // initialize vectors needed for transfer of Entities
         m_incomming_entities.resize(m_nMapsCount, TSVector<Entity>());
-
+        m_entities_buffer.resize(sim::MAX_POPULATION_PER_MAP + sim::MAX_FOOD_PER_MAP);
         // create environment with the specific coordinates
         m_envConfig.width = x;
         m_envConfig.height = 30;
-        mptr_buffer = std::make_shared<TSConsoleBuffer>(x,y);
+        mptr_buffer = std::make_shared<TSConsoleBuffer>(x, y);
         m_environment = std::make_unique<Environment>(m_console, m_envConfig, mptr_buffer, m_nMapsCount, &m_incomming_entities);
     }
 
@@ -39,15 +39,15 @@ namespace sim
             return;
         }
 
-        m_asio_update_thread = std::thread([this, nMaxMesseges, bWait](){
+        m_asio_update_thread = std::thread([this, nMaxMesseges, bWait]()
+                                           {
         while (true)
         {
             this->update(nMaxMesseges, bWait);
-        }
-        });
+        } });
 
-        //rendering loop
-        while(true)
+        // rendering loop
+        while (true)
         {
             mptr_buffer->write_buffer_to_console(&m_console);
         }
@@ -111,6 +111,10 @@ namespace sim
     {
         switch (msg.header.id)
         {
+        case params::MessageType::Send_Entities:
+            msg.pull_complex<Entity>(msg, m_entities_buffer.data(), sim::MAX_FOOD_PER_MAP + sim::MAX_POPULATION_PER_MAP);
+            m_incomming_entities.at(client->get_uid() - 10000) = m_entities_buffer; // = operator overloaded to wakeup m_mapThread
+            break;
         }
     }
 
@@ -129,6 +133,6 @@ namespace sim
             }
         }
 
-       m_buffer.write_buffer_to_console(&m_console);
+        m_buffer.write_buffer_to_console(&m_console);
     }
 }

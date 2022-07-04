@@ -51,6 +51,7 @@ namespace sim
         case params::MessageType::Send_Entities:
             msg.pull_complex<Entity>(msg, m_ent_buffer.data(), m_nentities_size);
             m_entities = m_ent_buffer; // = operator overloaded to wakeup m_mapThread
+            m_map->update_entities();
             break;
         }
     }

@@ -50,6 +50,7 @@ namespace sim
 
         //shared resources
         TSVector<TSVector<Entity>> m_incomming_entities; 
+        std::vector<Entity> m_entities_buffer;
     };
 
 }

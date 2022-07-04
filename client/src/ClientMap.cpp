@@ -1,5 +1,6 @@
 #include "ClientMap.h"
 #include "Rand.h"
+#include <chrono>
 #include <condition_variable>
 
 namespace sim
@@ -15,23 +16,32 @@ namespace sim
     }
 
     void ClientMap::run(bool synced)
-    {   
+    {
         start_up();
-        //main loop
-        while (true) //put condition here!
+        update_entities(false);
+        // main loop
+        while (true) // put condition here!
         {
-            //wait for new ping from the server to start next cycle else run till end of generation
-            if(synced)
+            // wait for new ping from the server to start next cycle else run till end of generation
+            if (synced)
                 mptr_connections->wait();
-            //run Neural Nets + directly update position on Map and Screen
-            //testing:
-            for(int i = 0; i < 99; i++)
+            // run Neural Nets + directly update position on Map and Screen
+            // testing:
+            try
             {
-                mptr_entities_external->at_mutable(i + 500).obj.x += rand<int>(0,2);
+                for (int i = 0; i < 5; i++)
+                {
+                    mptr_entities_external->at_mutable(i + 500).obj.move(rand<int>(-2, 2), rand<int>(-2, 2));
+                    update_single(&mptr_entities_external->at(i + 500));
+                    using namespace std::literals::chrono_literals;
+                    std::this_thread::sleep_for(10ms);
+                }
             }
-            update_entities();
+            catch (std::out_of_range &e)
+            {
+            }
             // check for connected entities -> have a deque where incomming info for displayed entities and outgoing info for their sensor inputs is stored and then distribute them here
-                //send connections to server
+            // send connections to server
             // send map to server
             m_entity_message.clear();
             m_entity_message.push_back_complex<Entity>(m_entity_message, mptr_entities_external->get_vector().data(), mptr_entities_external->size());

@@ -12,7 +12,7 @@ namespace sim
     /*Config values are only temporarily stored like this*/
     static constexpr int MAX_MAPCOUNT = 2;
     static constexpr int DEFAULT_MAP_COUNT = 2;
-    static constexpr int MAX_POPULATION_PER_MAP = 100;
+    static constexpr int MAX_POPULATION_PER_MAP = 5;
     static constexpr int MAX_FOOD_PER_MAP = 500;
 
     class Environment : public Map

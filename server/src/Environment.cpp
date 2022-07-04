@@ -73,7 +73,7 @@ namespace sim
                 mptr_incomming_entities->at(map_counter).push_back(temp_entity);
                 ++m_id_count;
             }
-            m_maps.at(map_counter).update_entities(&mptr_incomming_entities->at(map_counter));
+            m_maps.at(map_counter).update_entities(false);
         }
         /*Add Players to each map*/
         for (int map_counter = 0; map_counter < mptr_incomming_entities->size(); map_counter++)
@@ -92,7 +92,7 @@ namespace sim
                 mptr_incomming_entities->at(map_counter).push_back(temp_entity);
                 ++m_id_count;
             }
-            m_maps.at(map_counter).update_entities(&mptr_incomming_entities->at(map_counter));
+            m_maps.at(map_counter).update_entities(false);
         }
     }
 
