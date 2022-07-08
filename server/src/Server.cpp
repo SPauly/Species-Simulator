@@ -7,13 +7,13 @@ namespace sim
                                                         m_nMapsCount(nmapSize_)
     {
         // initialize vectors needed for transfer of Entities
-        m_incomming_entities.resize(m_nMapsCount, TSVector<Entity>());
-        m_change_buffer.resize(m_nMapsCount);
+        m_entities.resize(m_nMapsCount, TSVector<Entity>());
+        m_change_buffer.reserve(m_nMapsCount);
         // create environment with the specific coordinates
         m_envConfig.width = x;
         m_envConfig.height = 30;
         mptr_buffer = std::make_shared<TSConsoleBuffer>(x, y);
-        m_environment = std::make_unique<Environment>(m_console, m_envConfig, mptr_buffer, m_nMapsCount, &m_incomming_entities);
+        m_environment = std::make_unique<Environment>(m_console, m_envConfig, mptr_buffer, m_nMapsCount, &m_entities, &m_change_buffer);
     }
 
     void Server::mf_get_config()
@@ -77,8 +77,9 @@ namespace sim
         ent_msg.header.id = params::MessageType::Send_Entities_Size;
         ent_msg << m_environment->at_get_map(this->get_connections() - 1).get_entities_size();
         client->send(ent_msg);
+        ent_msg.clear();
         ent_msg.header.id = params::MessageType::Send_Entities;
-        ent_msg.push_back_complex<Entity>(ent_msg, m_incomming_entities.at(this->get_connections() - 1).get_vector().data(), m_incomming_entities.at(this->get_connections() - 1).size());
+        ent_msg.push_back_complex<Entity>(ent_msg, m_entities.at(this->get_connections() - 1).get_vector().data(), m_entities.at(this->get_connections() - 1).size());
         client->send(ent_msg);
     }
 
@@ -115,7 +116,7 @@ namespace sim
             std::shared_ptr<std::vector<Entity>> temp_buf = std::make_shared<std::vector<Entity>>((msg.size()*8)/sizeof(Entity));
             msg.pull_complex<Entity>(msg, temp_buf->data(), (msg.size()*8)/sizeof(Entity));
             m_change_buffer.at(client->get_uid() - 10000).push_back(temp_buf);
-            break;
+        break;
         }
     }
 

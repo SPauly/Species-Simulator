@@ -49,7 +49,7 @@ namespace sim
         std::thread m_asio_update_thread;
 
         //shared resources
-        TSVector<TSVector<Entity>> m_incomming_entities; 
+        TSVector<TSVector<Entity>> m_entities; 
         std::vector<net::TSQueue<std::shared_ptr<std::vector<Entity>>>> m_change_buffer; //buffer holds a vector of ques for each map with the incommming changes to entities
     };
 

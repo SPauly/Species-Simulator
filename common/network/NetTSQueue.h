@@ -60,13 +60,26 @@ namespace sim
 
         public:
             TSQueue() = default;                  // default CTOR
-            TSQueue(const TSQueue<T> &) = delete; // delete copy constructor
+            TSQueue(const TSQueue<T> &_t)
+            {
+            }
+            TSQueue(TSQueue&& _t) 
+            {
+            }
+
+            
             virtual ~TSQueue()
             {
-                clear();
             }
 
         public:
+            TSQueue<T> &operator=(TSQueue&& _t){
+                return *this;
+            }
+            
+            TSQueue<T> &operator=(const TSQueue& _t){
+                return *this;
+            }
             // implement all functions needed to operate the queue together with locking the scope
             const T &front()
             {

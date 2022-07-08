@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <vector>
 #include <thread>
+#include "NetInclude.h"
 #include "Params.h"
 #include "Map.h"
 #include "Entity.h"
@@ -18,7 +19,7 @@ namespace sim
     class Environment : public Map
     {
     public:
-        Environment(WinConsole &, params::MapConfig &, std::shared_ptr<TSConsoleBuffer>, int, TSVector<TSVector<Entity>>*);
+        Environment(WinConsole &, params::MapConfig &, std::shared_ptr<TSConsoleBuffer>, int, TSVector<TSVector<Entity>>*, std::vector<net::TSQueue<std::shared_ptr<std::vector<Entity>>>>*);
         virtual ~Environment();
         
         virtual void run(bool synced = false) override;
@@ -42,6 +43,7 @@ namespace sim
         std::vector<Map> m_maps;
         std::vector<std::thread> m_mapThreads;
 
-        TSVector<TSVector<Entity>> *mptr_incomming_entities; // A pointer to a vector of vectors of Entities -> used to hold different pointers to different vectors of incomming Entities
+        TSVector<TSVector<Entity>> *mptr_entities; // A pointer to a vector of vectors of Entities -> used to hold different pointers to different vectors of incomming Entities
+        std::vector<net::TSQueue<std::shared_ptr<std::vector<Entity>>>> *mptr_change_buffer; 
     };
 }

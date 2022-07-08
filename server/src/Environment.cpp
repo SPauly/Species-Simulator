@@ -4,20 +4,19 @@
 
 namespace sim
 {
-    Environment::Environment(WinConsole &_winconsole, params::MapConfig &_config, std::shared_ptr<TSConsoleBuffer> _conbuf, int _nmaps, TSVector<TSVector<Entity>> *_incomming_vec)
-        : Map(_winconsole, _config, nullptr,_conbuf), m_map_count(_nmaps)
+    Environment::Environment(WinConsole &_winconsole, params::MapConfig &_config, std::shared_ptr<TSConsoleBuffer> _conbuf, int _nmaps, TSVector<TSVector<Entity>> *_incomming_vec, std::vector<net::TSQueue<std::shared_ptr<std::vector<Entity>>>> *_change_buffer)
+        : Map(_winconsole, _config, nullptr, _conbuf), m_map_count(_nmaps), mptr_change_buffer(_change_buffer)
     {
         // instantiate dimensions of each map
         m_map_width = m_config.width / m_map_count;
         m_map_height = m_config.height;
 
-        mptr_incomming_entities = _incomming_vec;
+        mptr_entities = _incomming_vec;
     }
 
     Environment::~Environment()
     {
         bRUNNING = false;
-
     }
 
     void Environment::run(bool synced)
@@ -27,26 +26,32 @@ namespace sim
         m_create_entities();
 
         bRUNNING = true;
-        
-        //start threads to update Maps asynchronously
+
+        // start threads to update Maps asynchronously
         for (int i = 0; i < m_maps.size(); i++)
         {
             m_mapThreads.push_back(std::thread([this, i, synced]()
                                                {
                 m_maps.at(i).start_up();
-                while(bRUNNING){
-                    //wait till new entities are postet to vec
-                    mptr_incomming_entities->at(i).wait(); 
-                    //update entities on screen
-                    m_maps.at(i).update_entities();
-                    //send incomming connections to main distribution queue
+                while (bRUNNING)
+                {
+                    mptr_change_buffer->at(i).wait();
+                    while(!mptr_change_buffer->at(i).empty())
+                    {
+                        // iterate through first element -> implement in vector of all entities
+                        // update entities on screen
+                        m_maps.at(i).update_entities();
+                        // send incomming connections to main distribution queue
+                        //remove implemented updates from queue
+                        mptr_change_buffer->at(i).pop_front();
+                    }
                 } }));
         }
 
-                //join map threads
+        // join map threads
         for (int i = 0; i < m_maps.size(); i++)
         {
-            if(m_mapThreads.at(i).joinable())
+            if (m_mapThreads.at(i).joinable())
                 m_mapThreads.at(i).join();
         }
     }
@@ -57,7 +62,7 @@ namespace sim
         uint16_t randy = 0;
         Entity temp_entity;
         /*Add food to each map*/
-        for (int map_counter = 0; map_counter < mptr_incomming_entities->size(); map_counter++)
+        for (int map_counter = 0; map_counter < mptr_entities->size(); map_counter++)
         {
             for (int i = 0; i < MAX_FOOD_PER_MAP; i++)
             {
@@ -70,13 +75,13 @@ namespace sim
                 temp_entity._char = params::EntityStyle::FOOD;
                 temp_entity.type = params::EntityType::FOOD;
 
-                mptr_incomming_entities->at(map_counter).push_back(temp_entity);
+                mptr_entities->at(map_counter).push_back(temp_entity);
                 ++m_id_count;
             }
             m_maps.at(map_counter).update_entities(false);
         }
         /*Add Players to each map*/
-        for (int map_counter = 0; map_counter < mptr_incomming_entities->size(); map_counter++)
+        for (int map_counter = 0; map_counter < mptr_entities->size(); map_counter++)
         {
             for (int i = 0; i < MAX_POPULATION_PER_MAP; i++)
             {
@@ -89,7 +94,7 @@ namespace sim
                 temp_entity._char = params::EntityStyle::PLAYER;
                 temp_entity.type = params::EntityType::PLAYEROBJECT;
 
-                mptr_incomming_entities->at(map_counter).push_back(temp_entity);
+                mptr_entities->at(map_counter).push_back(temp_entity);
                 ++m_id_count;
             }
             m_maps.at(map_counter).update_entities(false);
@@ -113,7 +118,7 @@ namespace sim
 
             // set offset in Mapconfig
             temp_config.x = i * m_map_width;
-            m_maps.push_back({*mptr_console, temp_config, &mptr_incomming_entities->at(i), m_buffer});
+            m_maps.push_back({*mptr_console, temp_config, &mptr_entities->at(i), m_buffer});
         }
     }
 
