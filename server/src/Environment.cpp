@@ -32,19 +32,25 @@ namespace sim
         {
             m_mapThreads.push_back(std::thread([this, i, synced]()
                                                {
+                std::shared_ptr<std::vector<Entity>> ptr_tmp_buf;
                 m_maps.at(i).start_up();
-                while (bRUNNING)
+                try
                 {
-                    mptr_change_buffer->at(i).wait();
-                    while(!mptr_change_buffer->at(i).empty())
+                    while (bRUNNING)
                     {
-                        // iterate through first element -> implement in vector of all entities
-                        // update entities on screen
-                        m_maps.at(i).update_entities();
-                        // send incomming connections to main distribution queue
-                        //remove implemented updates from queue
-                        mptr_change_buffer->at(i).pop_front();
+                        mptr_change_buffer->at(i).wait();
+                        while (!mptr_change_buffer->at(i).empty())
+                        {
+                            ptr_tmp_buf = mptr_change_buffer->at(i).pop_front();
+                            // iterate through first element -> implement in vector of all entities
+                            // update entities on screen
+                            m_maps.at(i).update_entities();
+                            // send incomming connections to main distribution queue
+                        }
                     }
+                }
+                catch (std::out_of_range &e)
+                {
                 } }));
         }
 

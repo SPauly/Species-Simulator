@@ -16,7 +16,6 @@ namespace sim
         virtual ~Entity(){};
         Entity(const Entity&) = default;
         void move(int, int); //should return a vec2 with location
-
     public:
         uint64_t id = 0;
         uint16_t x, y = 0;
