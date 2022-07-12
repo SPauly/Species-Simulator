@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <vector>
 #include <thread>
+#include "NetInclude.h"
 #include "Params.h"
 #include "Map.h"
 #include "Entity.h"
@@ -12,16 +13,16 @@ namespace sim
     /*Config values are only temporarily stored like this*/
     static constexpr int MAX_MAPCOUNT = 2;
     static constexpr int DEFAULT_MAP_COUNT = 2;
-    static constexpr int MAX_POPULATION_PER_MAP = 100;
-    static constexpr int MAX_FOOD_PER_MAP = 3900;
+    static constexpr int MAX_POPULATION_PER_MAP = 5;
+    static constexpr int MAX_FOOD_PER_MAP = 500;
 
     class Environment : public Map
     {
     public:
-        Environment(WinConsole &, params::MapConfig &, int, TSVector<TSVector<Entity>>*);
+        Environment(WinConsole &, params::MapConfig &, std::shared_ptr<TSConsoleBuffer>, int, TSVector<TSVector<Entity>>*, std::vector<net::TSQueue<std::shared_ptr<std::vector<Entity>>>>*);
         virtual ~Environment();
         
-        virtual void run(size_t update_freq = -1) override;
+        virtual void run(bool synced = false) override;
 
         std::shared_ptr<Entity> check_pos(size_t,size_t);
 
@@ -42,6 +43,7 @@ namespace sim
         std::vector<Map> m_maps;
         std::vector<std::thread> m_mapThreads;
 
-        TSVector<TSVector<Entity>> *mptr_incomming_entities; // A pointer to a vector of vectors of Entities -> used to hold different pointers to different vectors of incomming Entities
+        TSVector<TSVector<Entity>> *mptr_entities; // A pointer to a vector of vectors of Entities -> used to hold different pointers to different vectors of incomming Entities
+        std::vector<net::TSQueue<std::shared_ptr<std::vector<Entity>>>> *mptr_change_buffer; 
     };
 }

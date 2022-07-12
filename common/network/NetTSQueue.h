@@ -53,20 +53,25 @@ namespace sim
         template <typename T>
         class TSQueue // Thread Save Queue -> basic Queue that blox it's scope during each operation to prevent multiple threads from reading and writing at the same time
         {
-        protected:
-            std::mutex muxQueue;
-            std::deque<T> deqQueue;
-            std::condition_variable cv_push;
-
         public:
             TSQueue() = default;                  // default CTOR
-            TSQueue(const TSQueue<T> &) = delete; // delete copy constructor
+            TSQueue(const TSQueue&) = delete;
+            TSQueue(TSQueue<T> &&new_item)
+            {
+                std::scoped_lock lock(muxQueue);
+                deqQueue = std::move(new_item.deqQueue);
+            }       
             virtual ~TSQueue()
             {
-                clear();
             }
 
         public:
+            TSQueue &operator=(TSQueue<T> &&new_item)
+            {
+                std::scoped_lock lock(muxQueue);
+                deqQueue = std::move(new_item.deqQueue);
+                return *this;
+            }
             // implement all functions needed to operate the queue together with locking the scope
             const T &front()
             {
@@ -139,6 +144,11 @@ namespace sim
                     cv_push.wait(wait_lock);
                 }
             }
+        protected:
+            std::mutex muxQueue;
+            std::deque<T> deqQueue;
+            std::condition_variable cv_push;
+
         };
     }
 }
