@@ -69,6 +69,13 @@ namespace sim
             cv_ptr = new_vec.cv_ptr;
         };
 
+        TSVector(TSVector<T> &&new_vec)
+        {
+            std::unique_lock<std::shared_mutex> lock(muxVec);
+            vec = std::move(new_vec.vec);
+            cv_ptr = std::move(new_vec.cv_ptr);
+        }
+
         virtual ~TSVector()
         {
             if (cv_ptr)
@@ -81,8 +88,8 @@ namespace sim
         {
             std::unique_lock<std::shared_mutex> lock(muxVec);
 
-            vec = new_vec.vec;
-            cv_ptr = new_vec.cv_ptr;
+            vec = std::move(new_vec.vec);
+            cv_ptr = std::move(new_vec.cv_ptr);
 
             cv_ptr->notify_one();
 
@@ -98,22 +105,6 @@ namespace sim
 
             cv_ptr->notify_one();
 
-            return *this;
-        }
-
-        TSVector<T> &operator=(const std::vector<T> &new_vec)
-        {
-            std::unique_lock<std::shared_mutex> lock(muxVec);
-
-            if (new_vec.size() != vec.size())
-                vec.resize(new_vec.size());
-
-            for (unsigned int i = 0; i < new_vec.size(); i++)
-            {
-                vec.at(i) = new_vec.at(i);
-            }
-
-            cv_ptr->notify_one();
             return *this;
         }
 

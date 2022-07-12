@@ -1,8 +1,5 @@
 #pragma once
 #include <cstdint>
-#include <thread>
-#include <mutex>
-#include <shared_mutex>
 #include "Params.h"
 
 namespace sim
@@ -14,7 +11,7 @@ namespace sim
         Entity(uint64_t, uint16_t, uint16_t, params::EntityStyle, params::EntityType);
         Entity(uint64_t, uint16_t, uint16_t, uint16_t, uint16_t, params::EntityStyle, params::EntityType);
         virtual ~Entity(){};
-        Entity(const Entity&) = default;
+
         void move(int, int); //should return a vec2 with location
     public:
         uint64_t id = 0;

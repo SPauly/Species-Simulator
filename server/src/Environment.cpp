@@ -42,6 +42,7 @@ namespace sim
                         while (!mptr_change_buffer->at(i).empty())
                         {
                             ptr_tmp_buf = mptr_change_buffer->at(i).pop_front();
+                            ptr_tmp_buf->at(0).x = 10;
                             // iterate through first element -> implement in vector of all entities
                             // update entities on screen
                             m_maps.at(i).update_entities();
