@@ -108,6 +108,22 @@ namespace sim
             return *this;
         }
 
+        TSVector<T> &operator=(const std::vector<T> &new_vec)
+        {
+            std::unique_lock<std::shared_mutex> lock(muxVec);
+
+            if (new_vec.size() != vec.size())
+                vec.resize(new_vec.size());
+
+            for(int i = 0; i < vec.size(); i++)
+            {
+                vec.at(i).obj = new_vec.at(i);
+            }
+
+            cv_ptr->notify_one();
+            return *this;
+        }
+
         //!!! use at_mutable() instead if T has to be thread save
         T &at(size_t pos)
         {

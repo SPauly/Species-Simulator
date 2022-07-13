@@ -4,8 +4,8 @@
 
 namespace sim
 {
-    Environment::Environment(WinConsole &_winconsole, params::MapConfig &_config, std::shared_ptr<TSConsoleBuffer> _conbuf, int _nmaps, TSVector<TSVector<Entity>> *_incomming_vec, std::vector<net::TSQueue<std::shared_ptr<std::vector<Entity>>>> *_change_buffer)
-        : Map(_winconsole, _config, nullptr, _conbuf), m_map_count(_nmaps), mptr_change_buffer(_change_buffer)
+    Environment::Environment(WinConsole &_winconsole, params::MapConfig &_config, std::shared_ptr<TSConsoleBuffer> _conbuf, int _nmaps, TSVector<TSVector<Entity>> *_incomming_vec)
+        : Map(_winconsole, _config, nullptr, _conbuf), m_map_count(_nmaps)
     {
         // instantiate dimensions of each map
         m_map_width = m_config.width / m_map_count;
@@ -32,18 +32,17 @@ namespace sim
         {
             m_mapThreads.push_back(std::thread([this, i, synced]()
                                                {
-                std::shared_ptr<std::vector<Entity>> ptr_tmp_buf;
                 m_maps.at(i).start_up();
+                m_maps.at(i).update_entities(false);
                 try
                 {
-                    while (bRUNNING)
+                    while (false) //bRUNNING
                     {
-                        mptr_change_buffer->at(i).wait();
-                        while (!mptr_change_buffer->at(i).empty())
+                        //wait for incomming changes from client
+                        while (false) //still updates in queue
                         {
-                            ptr_tmp_buf = mptr_change_buffer->at(i).pop_front();
-                            ptr_tmp_buf->at(0).x = 10;
-                            // iterate through first element -> implement in vector of all entities
+                            //pop first change of the queue 
+                            //merge changes into current entities
                             // update entities on screen
                             m_maps.at(i).update_entities();
                             // send incomming connections to main distribution queue

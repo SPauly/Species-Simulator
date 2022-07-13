@@ -10,7 +10,7 @@ namespace sim
         Entity() = default;
         Entity(uint64_t, uint16_t, uint16_t, params::EntityStyle, params::EntityType);
         Entity(uint64_t, uint16_t, uint16_t, uint16_t, uint16_t, params::EntityStyle, params::EntityType);
-        virtual ~Entity(){};
+        virtual ~Entity() = default;
 
         void move(int, int); //should return a vec2 with location
     public:

@@ -19,7 +19,7 @@ namespace sim
     class Environment : public Map
     {
     public:
-        Environment(WinConsole &, params::MapConfig &, std::shared_ptr<TSConsoleBuffer>, int, TSVector<TSVector<Entity>>*, std::vector<net::TSQueue<std::shared_ptr<std::vector<Entity>>>>*);
+        Environment(WinConsole &, params::MapConfig &, std::shared_ptr<TSConsoleBuffer>, int, TSVector<TSVector<Entity>>*);
         virtual ~Environment();
         
         virtual void run(bool synced = false) override;
@@ -44,6 +44,5 @@ namespace sim
         std::vector<std::thread> m_mapThreads;
 
         TSVector<TSVector<Entity>> *mptr_entities; // A pointer to a vector of vectors of Entities -> used to hold different pointers to different vectors of incomming Entities
-        std::vector<net::TSQueue<std::shared_ptr<std::vector<Entity>>>> *mptr_change_buffer; 
     };
 }

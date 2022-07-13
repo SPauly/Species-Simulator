@@ -8,12 +8,12 @@ namespace sim
     {
         // initialize vectors needed for transfer of Entities
         m_entities.resize(m_nMapsCount, TSVector<Entity>());
-        m_change_buffer.resize(m_nMapsCount);
+
         // create environment with the specific coordinates
         m_envConfig.width = x;
         m_envConfig.height = 30;
         mptr_buffer = std::make_shared<TSConsoleBuffer>(x, y);
-        m_environment = std::make_unique<Environment>(m_console, m_envConfig, mptr_buffer, m_nMapsCount, &m_entities, &m_change_buffer);
+        m_environment = std::make_unique<Environment>(m_console, m_envConfig, mptr_buffer, m_nMapsCount, &m_entities);
     }
 
     void Server::mf_get_config()
@@ -113,9 +113,8 @@ namespace sim
         switch (msg.header.id)
         {
         case params::MessageType::Send_Entities:
-            std::shared_ptr<std::vector<Entity>> temp_buf = std::make_shared<std::vector<Entity>>(msg.size()/sizeof(Entity));
-            msg.pull_complex<Entity>(msg, temp_buf->data(), msg.size()/sizeof(Entity));
-            m_change_buffer.at(client->get_uid() - 10000).push_back(temp_buf);
+            msg.clear();
+            //hand change buffer over to map
         break;
         }
     }
