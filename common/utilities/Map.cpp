@@ -43,14 +43,13 @@ namespace sim
             new_y = _ptr_ent->y;
             prev_x = new_x - _ptr_ent->velo_x;
             prev_y = new_y - _ptr_ent->velo_y;
-            // delete the Entity at it's previous position
-
-            m_entities_internal_map.at(prev_y * m_config.width + prev_x).reset();
-            m_buffer->write_character(prev_x, prev_y, ' ');
-
+            
             // write to new position
             m_entities_internal_map.at(new_y * m_config.width + new_x) = std::make_shared<Entity>(*_ptr_ent);
             m_buffer->write_character(new_x, new_y, (char)_ptr_ent->_char);
+            // delete the Entity at it's previous position
+            m_entities_internal_map.at(prev_y * m_config.width + prev_x).reset();
+            m_buffer->write_character(prev_x, prev_y, ' ');
         }
         catch (std::out_of_range &e)
         {
@@ -74,12 +73,13 @@ namespace sim
                 // delete the Entity at it's previous position
                 if (new_x != prev_x || new_y != prev_y || !efficiency_on || mptr_entities_external->at(i).type == params::EntityType::PLAYEROBJECT)
                 {
+                                        // write to new position
+                    m_entities_internal_map.at(new_y * m_config.width + (new_x + m_config.x)) = std::make_shared<Entity>(mptr_entities_external->at(i)); 
+                        //this actually should only be shared_ptr = shared_ptr to just changed the managed object -> do this after #39
+                    m_buffer->write_character((new_x + m_config.x), (new_y + m_config.y), (char)mptr_entities_external->at(i)._char);
+
                     m_entities_internal_map.at(prev_y * m_config.width + (prev_x + m_config.x)).reset();
                     m_buffer->write_character((prev_x + m_config.x), (prev_y + m_config.y), ' ');
-
-                    // write to new position
-                    m_entities_internal_map.at(new_y * m_config.width + (new_x + m_config.x)) = std::make_shared<Entity>(mptr_entities_external->at(i));
-                    m_buffer->write_character((new_x + m_config.x), (new_y + m_config.y), (char)mptr_entities_external->at(i)._char);
                 }
             }
         }
