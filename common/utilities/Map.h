@@ -13,16 +13,14 @@ namespace sim
     {
     public:
         Map() = delete;
-        Map(WinConsole &, params::MapConfig &, TSVector<Entity> *vec_ptr = nullptr);
         Map(WinConsole &, params::MapConfig &, TSVector<Entity> *, std::shared_ptr<TSConsoleBuffer>);
         virtual ~Map();
         
         void start_up();
-        virtual void run(size_t update_freq = 1);
-        void update_entities();
-        void update_entities(TSVector<Entity>* new_entities);
-        void render();
-        
+        virtual void run(bool synced = false);
+        void update_single(const Entity*);
+        void update_entities(bool efficiency_on = true); //efficiency_on = true -> only update those that changed
+        void render();        
         void draw_line(int, int, int, int, const char&);
 
         std::shared_ptr<Entity> check_pos(size_t, size_t);

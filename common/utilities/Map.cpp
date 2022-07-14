@@ -2,78 +2,90 @@
 
 namespace sim
 {
-    Map::Map(WinConsole &console, params::MapConfig &config, TSVector<Entity> *vecptr) 
-        : Map(console,config, vecptr, std::make_shared<TSConsoleBuffer>(config.width, config.height))
-    {
-    }
-
     Map::Map(WinConsole &console, params::MapConfig &config, TSVector<Entity> *vecptr, std::shared_ptr<TSConsoleBuffer> buffer)
         : mptr_console(&console), m_config(config), mptr_entities_external(vecptr), m_buffer(buffer)
     {
         m_entities_internal_map.resize(m_config.width * m_config.height, nullptr);
 
-        //set console layout
+        // set console layout
         m_conLay._nScreenWidth = m_config.width;
         m_conLay._nScreenHeight = m_config.height;
-        
-        //validate offset 
-        if(m_config.width + m_config.x > mptr_console->get_layout()._nScreenWidth)
+
+        // validate offset
+        if (m_config.width + m_config.x > mptr_console->get_layout()._nScreenWidth)
             m_config.x = mptr_console->get_layout()._nScreenWidth - m_config.width;
-        if(m_config.height + m_config.y > mptr_console->get_layout()._nScreenHeight)
+        if (m_config.height + m_config.y > mptr_console->get_layout()._nScreenHeight)
             m_config.y = mptr_console->get_layout()._nScreenHeight - m_config.height;
     }
 
     Map::~Map()
     {
     }
-    
-    void Map::start_up(){ 
+
+    void Map::start_up()
+    {
         m_draw_walls();
     }
 
-    void Map::run(size_t update_freq) //set freq. to 
-    {  
-        //main loop
-        //wait for x number of updates in m_entities_external
-        size_t wakeup_calls = 0;
-        std::shared_ptr<std::condition_variable_any> custom_cond = std::make_shared<std::condition_variable_any>();
-
-        while(wakeup_calls < update_freq)
-        {
-            mptr_entities_external->wait(custom_cond);
-            ++wakeup_calls;
-        }
-        //update entities accourdingly
-        update_entities();
-        //check for necessary connections that might have to be established
-    }
-    
-    void Map::update_entities()
+    void Map::run(bool synced) // set freq. to
     {
-        update_entities(mptr_entities_external);
     }
 
-    void Map::update_entities(TSVector<Entity> *new_entities)
+    void Map::update_single(const Entity *_ptr_ent)
     {
-        mptr_entities_external = new_entities;
-        
-        uint16_t new_x,new_y,prev_x,prev_y;
-
-        //downside of this is many new memory allocations have to be made, upside less CPU usage since I don't have to search for anything
-        for(int i = 0; i < new_entities->size(); i++)
+        if (!_ptr_ent)
+            return;
+        try
         {
-            new_x = new_entities->at(i).x;
-            new_y = new_entities->at(i).y;
-            prev_x = new_x - new_entities->at(i).velo_x;
-            prev_y = new_y - new_entities->at(i).velo_y;
-            //delete the Entity at it's previous position
-            m_entities_internal_map.at(prev_y * m_config.width + prev_x).reset();
-            m_buffer->write_character((prev_x + m_config.width), prev_y, ' ');
-            //check if Entity has to be pushed to connections
+            int new_x, new_y, prev_x, prev_y;
+
+            new_x = _ptr_ent->x;
+            new_y = _ptr_ent->y;
+            prev_x = new_x - _ptr_ent->velo_x;
+            prev_y = new_y - _ptr_ent->velo_y;
             
-            //write to new position
-            m_entities_internal_map.at(new_y * m_config.width + new_x) = std::make_shared<Entity>(new_entities->at(i));
-            m_buffer->write_character((new_x + m_config.x), (new_y + m_config.y), (char)new_entities->at(i)._char);
+            // write to new position
+            m_entities_internal_map.at(new_y * m_config.width + new_x) = std::make_shared<Entity>(*_ptr_ent);
+            m_buffer->write_character(new_x, new_y, (char)_ptr_ent->_char);
+            // delete the Entity at it's previous position
+            m_entities_internal_map.at(prev_y * m_config.width + prev_x).reset();
+            m_buffer->write_character(prev_x, prev_y, ' ');
+        }
+        catch (std::out_of_range &e)
+        {
+            return;
+        }
+    }
+
+    void Map::update_entities(bool efficiency_on)
+    {
+        uint16_t new_x, new_y, prev_x, prev_y;
+
+        // downside of this is many new memory allocations have to be made, upside less CPU usage since I don't have to search for anything
+        try
+        {
+            for (int i = 0; i < mptr_entities_external->size(); i++)
+            {
+                new_x = mptr_entities_external->at(i).x;
+                new_y = mptr_entities_external->at(i).y;
+                prev_x = new_x - mptr_entities_external->at(i).velo_x;
+                prev_y = new_y - mptr_entities_external->at(i).velo_y;
+                // delete the Entity at it's previous position
+                if (new_x != prev_x || new_y != prev_y || !efficiency_on || mptr_entities_external->at(i).type == params::EntityType::PLAYEROBJECT)
+                {
+                                        // write to new position
+                    m_entities_internal_map.at(new_y * m_config.width + (new_x + m_config.x)) = std::make_shared<Entity>(mptr_entities_external->at(i)); 
+                        //this actually should only be shared_ptr = shared_ptr to just changed the managed object -> do this after #39
+                    m_buffer->write_character((new_x + m_config.x), (new_y + m_config.y), (char)mptr_entities_external->at(i)._char);
+
+                    m_entities_internal_map.at(prev_y * m_config.width + (prev_x + m_config.x)).reset();
+                    m_buffer->write_character((prev_x + m_config.x), (prev_y + m_config.y), ' ');
+                }
+            }
+        }
+        catch (const std::out_of_range &e)
+        {
+            return;
         }
     }
 
@@ -110,12 +122,12 @@ namespace sim
         if (_y + dif_y > m_config.height - 1)
             dif_y = m_config.height - 1 - _y;
 
-        //first print rows
+        // first print rows
         for (int r = 0; r <= dif_x; r++)
         {
             m_buffer->write_character((_x + r + m_config.x), _y + m_config.y, _symb);
         }
-        //then columns
+        // then columns
         for (int c = 0; c <= dif_y; c++)
         {
             m_buffer->write_character(_x + m_config.x, (_y + c + m_config.y), _symb);
@@ -124,7 +136,7 @@ namespace sim
 
     void Map::m_draw_walls()
     {
-        //draw the walls
+        // draw the walls
         switch (m_config.WallOne)
         {
         case params::MapType::No_Walls:
@@ -208,11 +220,11 @@ namespace sim
         m_buffer->write_buffer_to_console(mptr_console);
     }
 
-    params::MapConfig& Map::get_config()
+    params::MapConfig &Map::get_config()
     {
         return m_config;
     }
-    params::WinConsoleLayout& Map::get_layout()
+    params::WinConsoleLayout &Map::get_layout()
     {
         return m_conLay;
     }

@@ -30,13 +30,15 @@ namespace sim
         //FLAGS
         bool M_STARTUP_OKAY = false; //set to true when everything was initialized properly
         
-        //Connection details
+        //Connection
         const std::string m_host;
         const uint16_t m_port;
+        std::thread m_asio_update_thread;
 
         //Console 
         params::WinConsoleLayout m_console_layout;  
         WinConsole m_console{m_console_layout};
+        std::shared_ptr<TSConsoleBuffer> mptr_console_buffer;
 
         //Map
         std::thread m_mapThread; 
@@ -47,5 +49,6 @@ namespace sim
         //shared resources
         size_t m_nentities_size = 0;
         TSVector<Entity> m_entities;
+        TSVector<Entity> m_connection_entities;
     };
 }

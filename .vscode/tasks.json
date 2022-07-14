@@ -64,6 +64,6 @@
 			],
 			"group": "build",
 			"detail": "Compiler: C:/msys64/mingw64/bin/g++.exe"
-		},
+		}
 	]
 }

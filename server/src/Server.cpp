@@ -7,12 +7,13 @@ namespace sim
                                                         m_nMapsCount(nmapSize_)
     {
         // initialize vectors needed for transfer of Entities
-        m_incomming_entities.resize(m_nMapsCount, TSVector<Entity>());
+        m_entities.resize(m_nMapsCount, TSVector<Entity>());
 
         // create environment with the specific coordinates
         m_envConfig.width = x;
         m_envConfig.height = 30;
-        m_environment = std::make_unique<Environment>(m_console, m_envConfig, m_nMapsCount, &m_incomming_entities);
+        mptr_buffer = std::make_shared<TSConsoleBuffer>(x, y);
+        m_environment = std::make_unique<Environment>(m_console, m_envConfig, mptr_buffer, m_nMapsCount, &m_entities);
     }
 
     void Server::mf_get_config()
@@ -38,13 +39,23 @@ namespace sim
             return;
         }
 
+        m_asio_update_thread = std::thread([this, nMaxMesseges, bWait]()
+                                           {
         while (true)
         {
             this->update(nMaxMesseges, bWait);
+        } });
+
+        // rendering loop
+        while (true)
+        {
+            mptr_buffer->write_buffer_to_console(&m_console);
         }
 
         if (m_EnvThread.joinable())
             m_EnvThread.join();
+        if (m_asio_update_thread.joinable())
+            m_asio_update_thread.join();
     }
 
     void Server::on_client_validated(std::shared_ptr<net::Connection<params::MessageType>> client)
@@ -66,8 +77,9 @@ namespace sim
         ent_msg.header.id = params::MessageType::Send_Entities_Size;
         ent_msg << m_environment->at_get_map(this->get_connections() - 1).get_entities_size();
         client->send(ent_msg);
+        ent_msg.clear();
         ent_msg.header.id = params::MessageType::Send_Entities;
-        ent_msg.push_back_complex<Entity>(ent_msg, m_incomming_entities.at(this->get_connections() - 1).get_vector().data(), m_incomming_entities.at(this->get_connections() - 1).size());
+        ent_msg.push_back_complex<Entity>(ent_msg, m_entities.at(this->get_connections() - 1).get_vector().data(), m_entities.at(this->get_connections() - 1).size());
         client->send(ent_msg);
     }
 
@@ -100,6 +112,10 @@ namespace sim
     {
         switch (msg.header.id)
         {
+        case params::MessageType::Send_Entities:
+            msg.clear();
+            //hand change buffer over to map
+        break;
         }
     }
 
@@ -118,6 +134,6 @@ namespace sim
             }
         }
 
-       m_buffer.write_buffer_to_console(&m_console);
+        m_buffer.write_buffer_to_console(&m_console);
     }
 }

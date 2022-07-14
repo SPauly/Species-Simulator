@@ -9,4 +9,13 @@ namespace sim
     Entity::Entity(uint64_t _id, uint16_t _x, uint16_t _y, uint16_t _velx, uint16_t _vely, params::EntityStyle _style, params::EntityType _type)
         : id(_id), x(_x), y(_y), velo_x(_velx), velo_y(_vely), _char(_style), type(_type)
     {}
+
+    void Entity::move(int _vx, int _vy)
+    {
+        x += _vx;
+        y += _vy;
+        velo_x = _vx;
+        velo_y = _vy;
+        return;
+    }
 }
