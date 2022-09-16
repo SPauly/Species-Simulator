@@ -101,8 +101,11 @@ namespace sim // global namespace for species simulator
             {
                 size_t current_body_size = msg.body.size();
 
-                msg.body.resize(current_body_size + (sizeof(ComplexDataType) * size_of_data));
-                std::memcpy(msg.body.data() + current_body_size, data, size_of_data * sizeof(ComplexDataType));
+                //compute amount of bytes to reserve for data
+                size_t bytes = sizeof(ComplexDataType) * size_of_data;
+
+                msg.body.resize(current_body_size + bytes);
+                std::memcpy(msg.body.data() + current_body_size, data, bytes);
 
                 msg.header.size = msg.size();
 

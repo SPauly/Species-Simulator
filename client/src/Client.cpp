@@ -1,5 +1,6 @@
 #include "Client.h"
 #include "Rand.h"
+
 namespace sim
 {
     Client::Client(const std::string &host, const uint16_t port)
@@ -12,7 +13,8 @@ namespace sim
     {
         if (m_mapThread.joinable())
             m_mapThread.join();
-
+        if (m_asio_update_thread.joinable())
+            m_asio_update_thread.join();
         disconnect();
     }
 
@@ -25,24 +27,21 @@ namespace sim
         m_mapThread = std::thread([this]()
                                   { if(m_map) 
                                         m_map->run(); });
-        //testing
-        auto TestThread = std::thread([this]()
-                            {
-                                while(true)
-                                {
-                                    for(int i = 0; i < 100; i++)
-                                    {
-                                        m_entities.at_mutable(i).obj.x += rand<int>(-1,1);
-                                        m_entities.at_mutable(i).obj.y += rand<int>(-1,1);
-                                    }
-                                }
-                            });
-        // prime main thread with message distribution work
-        while (true)
+
+
+        // prime asio thread with message distribution work
+        m_asio_update_thread = std::thread([this]()
+        { while (true)
         {
             update(-1, true); // runs the asio loop -> processes incomming messages
         }
-        TestThread.join();
+        });
+
+        //prime main thread with 30fps rendering
+        while(true)
+        {
+            mptr_console_buffer->write_buffer_to_console(&m_console);
+        }
     }
 
     void Client::on_message(net::Message<params::MessageType> &msg)
@@ -52,6 +51,7 @@ namespace sim
         case params::MessageType::Send_Entities:
             msg.pull_complex<Entity>(msg, m_ent_buffer.data(), m_nentities_size);
             m_entities = m_ent_buffer; // = operator overloaded to wakeup m_mapThread
+            m_map->update_entities();
             break;
         }
     }
@@ -75,11 +75,12 @@ namespace sim
                         msg >> m_console_layout;
                         m_console_layout._nScreenHeight += 5; // leave space for stats
                         m_console.create_console(m_console_layout);
+                        mptr_console_buffer = std::make_shared<TSConsoleBuffer>(m_console_layout._nScreenWidth, m_console_layout._nScreenHeight);
                         GOT_CONSOLE = true;
                         break;
                     case params::MessageType::Send_Map_Layout:
                         msg >> m_map_config;
-                        m_map = std::make_unique<ClientMap>(m_console, m_map_config, &m_entities, &m_uptrConnection);
+                        m_map = std::make_unique<ClientMap>(m_console, m_map_config, &m_entities, mptr_console_buffer, &m_uptrConnection);
                         GOT_MAP = true;
                         break;
                     case params::MessageType::Send_Entities_Size:
