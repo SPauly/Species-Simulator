@@ -100,6 +100,9 @@ namespace sim
     {
         switch (msg.header.id)
         {
+        case params::MessageType::Send_Entities:
+            m_environment->new_entities(client,msg);
+            break;
         }
     }
 

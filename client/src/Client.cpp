@@ -1,5 +1,5 @@
 #include "Client.h"
-
+#include "Rand.h"
 namespace sim
 {
     Client::Client(const std::string &host, const uint16_t port)
@@ -25,12 +25,24 @@ namespace sim
         m_mapThread = std::thread([this]()
                                   { if(m_map) 
                                         m_map->run(); });
-
+        //testing
+        auto TestThread = std::thread([this]()
+                            {
+                                while(true)
+                                {
+                                    for(int i = 0; i < 100; i++)
+                                    {
+                                        m_entities.at_mutable(i).obj.x += rand<int>(-1,1);
+                                        m_entities.at_mutable(i).obj.y += rand<int>(-1,1);
+                                    }
+                                }
+                            });
         // prime main thread with message distribution work
         while (true)
         {
             update(-1, true); // runs the asio loop -> processes incomming messages
         }
+        TestThread.join();
     }
 
     void Client::on_message(net::Message<params::MessageType> &msg)

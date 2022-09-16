@@ -11,6 +11,7 @@ namespace sim
         m_map_width = m_config.width / m_map_count;
         m_map_height = m_config.height;
 
+        m_buffer_entities.resize(m_map_count);
         mptr_incomming_entities = _incomming_vec;
     }
 
@@ -56,6 +57,13 @@ namespace sim
 
     }
 
+    void Environment::new_entities(std::shared_ptr<net::Connection<params::MessageType>> client, net::Message<params::MessageType> &msg)
+    {   
+        //check uid here to see which map to change
+        msg.pull_complex<Entity>(msg, m_buffer_entities.at(0).data(), mptr_incomming_entities->at(0).size());
+        mptr_incomming_entities->at(0) = m_buffer_entities.at(0); // = operator overloaded to wakeup m_mapThread
+    }   
+
     void Environment::m_create_entities()
     {
         uint16_t randx = 0;
@@ -74,6 +82,25 @@ namespace sim
                 temp_entity.y = randy;
                 temp_entity._char = params::EntityStyle::FOOD;
                 temp_entity.type = params::EntityType::FOOD;
+
+                mptr_incomming_entities->at(map_counter).push_back(temp_entity);
+                ++m_id_count;
+            }
+            m_maps.at(map_counter).update_entities(&mptr_incomming_entities->at(map_counter));
+        }
+        /*Add players to each map*/
+        for (int map_counter = 0; map_counter < mptr_incomming_entities->size(); map_counter++)
+        {
+            for (int i = 0; i < MAX_POPULATION_PER_MAP; i++)
+            {
+                randx = sim::rand(1, m_map_width - 1);
+                randy = sim::rand(1, m_map_height - 1);
+
+                temp_entity.id = m_id_count;
+                temp_entity.x = randx;
+                temp_entity.y = randy;
+                temp_entity._char = params::EntityStyle::PLAYER;
+                temp_entity.type = params::EntityType::PLAYEROBJECT;
 
                 mptr_incomming_entities->at(map_counter).push_back(temp_entity);
                 ++m_id_count;
