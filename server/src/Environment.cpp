@@ -4,14 +4,12 @@
 
 namespace sim
 {
-    Environment::Environment(WinConsole &_winconsole, params::MapConfig &_config, std::shared_ptr<TSConsoleBuffer> _conbuf, int _nmaps, TSVector<TSVector<Entity>> *_incomming_vec)
+    Environment::Environment(WinConsole &_winconsole, params::MapConfig &_config, std::shared_ptr<TSConsoleBuffer> _conbuf, int _nmaps)
         : Map(_winconsole, _config, nullptr, _conbuf), m_map_count(_nmaps)
     {
         // instantiate dimensions of each map
         m_map_width = m_config.width / m_map_count;
         m_map_height = m_config.height;
-
-        mptr_entities = _incomming_vec;
     }
 
     Environment::~Environment()
@@ -59,6 +57,17 @@ namespace sim
         {
             if (m_mapThreads.at(i).joinable())
                 m_mapThreads.at(i).join();
+        }
+    }
+
+    void Environment::message_handler(net::Message<params::MessageType> &msg, std::shared_ptr<net::Connection<params::MessageType>> client)
+    {
+        switch (msg.header.id)
+        {
+        case params::MessageType::Send_Entities:
+            // extract new entities from message
+            // push Entities into accourding map
+            break;
         }
     }
 

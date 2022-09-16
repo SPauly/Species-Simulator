@@ -113,8 +113,7 @@ namespace sim
         switch (msg.header.id)
         {
         case params::MessageType::Send_Entities:
-            msg.clear();
-            //hand change buffer over to map
+            m_environment->message_handler(msg, client);
         break;
         }
     }

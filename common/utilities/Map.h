@@ -36,7 +36,8 @@ namespace sim
         params::MapConfig m_config;
         std::shared_ptr<TSConsoleBuffer> m_buffer;
         WinConsole *mptr_console = nullptr;
-        TSVector<Entity> *mptr_entities_external = nullptr;
+        std::vector<std::shared_ptr<Entity>> m_entity_buffer;
+        
     private:
         params::WinConsoleLayout m_conLay;
         std::vector<std::shared_ptr<Entity>> m_entities_internal_map;
