@@ -22,6 +22,29 @@ namespace sim
 
     void Server::run(size_t nMaxMesseges = -1, bool bWait = false)
     {
+        //new main loop proposal:
+        //start server
+        if (!this->start_server())
+        {
+            // inform of failure
+            return;
+        }
+        //start asio update thread wait for client connections
+        //setup client handlers for each connection
+        //      client handlers setup environment and send entities to respective connections
+        //      on_message distributes procedure calls and messages to respective client handlers work queue
+        //if not all client handler threads are running setup thread to handle client handlers work on queue
+        //      client handlers work and post regular frames into a queue
+        m_asio_update_thread = std::thread([this, nMaxMesseges, bWait]()
+                                           {
+        while (true)
+        {
+            this->update(nMaxMesseges, bWait);
+        } });
+        //main thread adds frames together and renders 
+        //posts public updates to message all clients and controll the environment
+
+        //----- old loop ------
         if (!this->start_server())
         {
             // inform of failure

@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
-#include "Map.h"
-#include "NetConnection.h"
+#include "NetInclude.h"
+#include "Params.h"
 
 namespace sim
 {
@@ -12,7 +12,6 @@ namespace sim
         virtual ~ClientHandler();
     private:
        std::shared_ptr<sim::net::Connection<params::MessageType>> mptr_connection;
-       Map m_map; 
     };
 
 }
