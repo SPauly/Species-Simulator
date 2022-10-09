@@ -31,7 +31,8 @@ namespace sim
             Send_Map_Layout, //MapConfig Type 
             Send_Entities_Size,
             Send_Entities,
-            Send_SimConfig
+            Send_SimConfig,
+            Send_Status
         };
 
         // type used by Map instance
@@ -92,10 +93,18 @@ namespace sim
             uint16_t WallFour = 0;
         };
 
-        struct SimConfig
+        struct EntityConfig
         {
             uint16_t nplayer = 0;
-            uint16_t food = 0;
+            uint16_t nfood = 0;
+        };
+
+        struct SimConfig
+        {
+            SimConfig() = default;
+            SimConfig(EntityConfig &_e, MapConfig &_m, WinConsoleLayout &_w)
+                : entity_con(_e), map_con(_m), win_layout(_w){};
+            EntityConfig entity_con;
             MapConfig map_con;
             WinConsoleLayout win_layout;
         };

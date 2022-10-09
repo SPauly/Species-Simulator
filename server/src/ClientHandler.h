@@ -8,6 +8,9 @@ namespace sim
 {
     //flags
     static constexpr int CTOR_FAIL = 0x001;
+    static constexpr int CLIENT_READY = 0x001;
+    static constexpr int CLIENT_NOT_READY = 0xFFF;
+    static constexpr int CLIENT_FAIL = 0x000;
 
     class ClientHandler{
     public:
@@ -21,11 +24,13 @@ namespace sim
     private:
         void setup();
         void run();
-   
+        
+        net::Message<params::MessageType> &wait_for_response(uint32_t);
     private:
         //flags
         int ERROR_FLAG = 0x000;
-        
+        int CLIENT_STATUS = CLIENT_NOT_READY;
+
         //functional variables
         std::shared_ptr<sim::net::Connection<params::MessageType>> mptr_connection;
         std::thread m_thread;
@@ -33,6 +38,12 @@ namespace sim
 
         //communication
         net::Message<params::MessageType> msg;
+
+        //simulation configuration
+        params::SimConfig mparam_simconfig;
+        params::WinConsoleLayout mparam_winconsolelayout;
+        params::EntityConfig mparam_entityconfig;
+        params::MapConfig mparam_mapconfig;
     };
 
 }
