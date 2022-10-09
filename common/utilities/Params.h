@@ -30,7 +30,8 @@ namespace sim
             Send_Map_Console_Layout, //WinConsoleLayout Type
             Send_Map_Layout, //MapConfig Type 
             Send_Entities_Size,
-            Send_Entities
+            Send_Entities,
+            Send_SimConfig
         };
 
         // type used by Map instance
@@ -89,6 +90,14 @@ namespace sim
             uint16_t WallTwo = 0;
             uint16_t WallThree = 0;
             uint16_t WallFour = 0;
+        };
+
+        struct SimConfig
+        {
+            uint16_t nplayer = 0;
+            uint16_t food = 0;
+            MapConfig map_con;
+            WinConsoleLayout win_layout;
         };
     }
 }

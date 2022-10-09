@@ -9,6 +9,7 @@
 #include "WinConsole.h"
 #include "Entity.h"
 #include "TSVector.h"
+#include "ClientHandler.h"
 
 namespace sim
 {
@@ -39,17 +40,12 @@ namespace sim
     	WinConsole m_console{0,0,x,y,8,16};
         std::shared_ptr<TSConsoleBuffer> mptr_buffer; 
 
-        //environment related
+        //client related
         size_t m_nMapsCount = DEFAULT_MAP_COUNT;
-        params::MapConfig m_envConfig{0,0,0,0,params::MapType::No_Walls};
-        std::unique_ptr<Environment> m_environment;
-        std::thread m_EnvThread;
+        std::vector<ClientHandler> mvec_client_handlers;
 
         //asio thread
         std::thread m_asio_update_thread;
-
-        //shared resources
-        TSVector<TSVector<Entity>> m_entities; 
     };
 
 }
