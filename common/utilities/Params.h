@@ -32,7 +32,10 @@ namespace sim
             Send_Entities_Size,
             Send_Entities,
             Send_SimConfig,
-            Send_Status
+            Send_Status,
+
+            Request,
+            Response
         };
 
         // type used by Map instance

@@ -42,7 +42,7 @@ namespace sim
 
         //client related
         size_t m_nMapsCount = DEFAULT_MAP_COUNT;
-        std::vector<ClientHandler> mvec_client_handlers;
+        std::vector<std::shared_ptr<ClientHandler>> mvec_client_handlers;
 
         //asio thread
         std::thread m_asio_update_thread;

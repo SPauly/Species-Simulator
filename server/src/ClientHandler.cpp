@@ -33,7 +33,8 @@ namespace sim
         mptr_connection->send(msg);
         //wait for okay from client
         wait_for_response(2929) >> CLIENT_STATUS;
-        if(CLIENT_STATUS == CLIENT_READY)
+        
+        if(CLIENT_STATUS != CLIENT_FAIL)
             run();
     }
 
@@ -45,7 +46,11 @@ namespace sim
 
             while(!mdeq_msg.empty())
             {
-
+                auto current_msg = mdeq_msg.pop_front();
+                switch(current_msg.header.id)
+                {
+                    
+                };
             }
         }
     }

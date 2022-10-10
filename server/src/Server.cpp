@@ -63,7 +63,7 @@ namespace sim
 
     void Server::on_client_validated(std::shared_ptr<net::Connection<params::MessageType>> client)
     {
-        mvec_client_handlers.push_back(client);
+        mvec_client_handlers.push_back(std::make_shared<ClientHandler>(client));
     }
 
     bool Server::on_client_connect(std::shared_ptr<net::Connection<params::MessageType>> client)
@@ -93,7 +93,7 @@ namespace sim
 
     void Server::on_message(std::shared_ptr<net::Connection<params::MessageType>> client, net::Message<params::MessageType> &msg)
     {
-        mvec_client_handlers.at(client->get_uid() - 10000).push_back(msg); 
+        mvec_client_handlers.at(client->get_uid() - 10000)->push_back(msg); 
         // or directly forward it to the regarding client
     }
 

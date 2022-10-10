@@ -54,6 +54,7 @@ namespace sim // global namespace for species simulator
         struct MessageHeader  // Message Header contains the size of the message and the type of message send specified by the custom message type T
         {
             T id{};
+            uint32_t receiver = 0;
             uint32_t size = 0;
         };
 
