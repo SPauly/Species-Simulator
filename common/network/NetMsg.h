@@ -55,6 +55,7 @@ namespace sim // global namespace for species simulator
         {
             T id{};
             uint32_t receiver = 0;
+            uint16_t request_id = 0;
             uint32_t size = 0;
         };
 

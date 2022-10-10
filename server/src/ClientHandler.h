@@ -25,7 +25,8 @@ namespace sim
         void setup();
         void run();
         
-        net::Message<params::MessageType> &wait_for_response(uint32_t);
+        template <typename T>
+        T &wait_for_response(uint16_t, T&);
     private:
         //flags
         int ERROR_FLAG = 0x000;

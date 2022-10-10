@@ -28,11 +28,11 @@ namespace sim
     {
         //send all the config stuff to clients and wait for go from client
         msg.header.id = params::MessageType::Send_SimConfig;
-        msg.header.receiver = 2929;
+        msg.header.request_id = 2929;
         msg << mparam_simconfig;
         mptr_connection->send(msg);
         //wait for okay from client
-        wait_for_response(2929) >> CLIENT_STATUS;
+        wait_for_response<int>(2929, CLIENT_STATUS);
         
         if(CLIENT_STATUS != CLIENT_FAIL)
             run();
@@ -60,18 +60,20 @@ namespace sim
         mdeq_msg.push_back(_msg);
     }
 
-    net::Message<params::MessageType> &ClientHandler::wait_for_response(uint32_t _key)
+    template <typename T>
+    T &ClientHandler::wait_for_response(uint16_t _key, T &_var)
     {
         bool got_response = false;
  
         while(!got_response)
         {
             mdeq_msg.wait();
-            if(mdeq_msg.back().header.receiver == _key || mdeq_msg.front().header.receiver == _key)
+            if(mdeq_msg.back().header.request_id == _key || mdeq_msg.front().header.request_id == _key)
                 got_response = true;
         }
 
-        auto response = (mdeq_msg.back().header.receiver == _key) ? mdeq_msg.back() : mdeq_msg.front();
-        return response;
+        auto response = (mdeq_msg.back().header.request_id == _key) ? mdeq_msg.back() : mdeq_msg.front();
+        response >> _var;
+        return _var;
     }
 }

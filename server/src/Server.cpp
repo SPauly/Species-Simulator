@@ -15,29 +15,6 @@ namespace sim
 
     void Server::run(size_t nMaxMesseges = -1, bool bWait = false)
     {
-        //new main loop proposal:
-        //start server
-        if (!this->start_server())
-        {
-            // inform of failure
-            return;
-        }
-        //start asio update thread wait for client connections
-        //setup client handlers for each connection
-        //      client handlers setup environment and send entities to respective connections
-        //      on_message distributes procedure calls and messages to respective client handlers work queue
-        //if not all client handler threads are running setup thread to handle client handlers work on queue
-        //      client handlers work and post regular frames into a queue
-        m_asio_update_thread = std::thread([this, nMaxMesseges, bWait]()
-                                           {
-        while (true)
-        {
-            this->update(nMaxMesseges, bWait);
-        } });
-        //main thread adds frames together and renders 
-        //posts public updates to message all clients and controll the environment
-
-        //----- old loop ------
         if (!this->start_server())
         {
             // inform of failure
@@ -93,8 +70,26 @@ namespace sim
 
     void Server::on_message(std::shared_ptr<net::Connection<params::MessageType>> client, net::Message<params::MessageType> &msg)
     {
-        mvec_client_handlers.at(client->get_uid() - 10000)->push_back(msg); 
-        // or directly forward it to the regarding client
+        switch(msg.header.id)
+        {
+            case params::MessageType::Send_Screen_Buffer:
+                //forward to screen buffer
+                break;
+            case params::MessageType::Direct_Response:
+                message_client(msg.header.receiver, msg);
+                break;
+            case params::MessageType::Response:
+                (msg.header.receiver != 0) ? mvec_client_handlers.at(msg.header.receiver - 10000)->push_back(msg)
+                    : mvec_client_handlers.at(client->get_uid() - 10000)->push_back(msg); 
+                break;
+            case params::MessageType::Request:
+                (msg.header.receiver != 0) ? mvec_client_handlers.at(msg.header.receiver - 10000)->push_back(msg)
+                    : mvec_client_handlers.at(client->get_uid() - 10000)->push_back(msg); 
+                break;
+            default:
+                mvec_client_handlers.at(client->get_uid() - 10000)->push_back(msg);
+                break; 
+        }
     }
 
     void Server::test_console()
